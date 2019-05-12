@@ -19,7 +19,8 @@ namespace CemuStub
     public static class CemuWatch
     {
         static Timer watch = new Timer();
-        public static string expectedCemuTitle = "Cemu 1.15.6c";
+
+        public static string expectedCemuTitle = "Cemu 1.15.5c";
         public static string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
 
@@ -87,7 +88,7 @@ namespace CemuStub
             if (state == CemuState.RUNNING && cemuProcess.MainWindowTitle.Contains("[TitleId:"))
                 state = CemuState.GAMELOADED;
 
-            if (state == CemuState.GAMELOADED)
+            if(state == CemuState.GAMELOADED)
             {
                 state = CemuState.PREPARING; // this prevents the ticker to call this method again
 
@@ -109,7 +110,9 @@ namespace CemuStub
                 EnableButtons();
 
                 VanguardCore.Start();
+
             }
+
         }
 
         private static void LoadRpxFileInterface()
@@ -161,22 +164,6 @@ namespace CemuStub
             p.WaitForExit();
         }
 
-        public static int IndexOf<T>(this T[] haystack, T[] needle)
-        {
-            if ((needle != null) && (haystack.Length >= needle.Length))
-            {
-                for (int l = 0; l < haystack.Length - needle.Length + 1; l++)
-                {
-                    if (!needle.Where((data, index) => !haystack[l + index].Equals(data)).Any())
-                    {
-                        return l;
-                    }
-                }
-            }
-
-            return -1;
-        }
-
         private static void LoadDataFromCemuFiles()
         {
             ///
@@ -184,34 +171,18 @@ namespace CemuStub
             ///
 
             string[] logTxt = File.ReadAllLines(Path.Combine(cemuExeFile.DirectoryName, "log.txt"));
-            //string[] settingsXml = File.ReadAllLines(Path.Combine(cemuExeFile.DirectoryName, "settings.xml"));
-            byte[] settingsBin = File.ReadAllBytes(Path.Combine(cemuExeFile.DirectoryName, "settings.bin"));
-
-
+            string[] settingsXml = File.ReadAllLines(Path.Combine(cemuExeFile.DirectoryName, "settings.xml"));
 
             //getting rpx filename from log.txt
             string logLoadingLine = logTxt.FirstOrDefault(it => it.Contains("Loading") && it.Contains(".rpx"));
             string[] logLoadingLineParts = logLoadingLine.Split(' ');
             rpxFile = logLoadingLineParts[logLoadingLineParts.Length - 1];
 
-            //Getting rpx path from settings.bin
-            byte[] rpx = { 0x2E, 0x00, 0x72, 0x00, 0x70, 0x00, 0x78 }; //".rpx" with the extra characters
-            int startOffset = 0xB7;
-            var endOffset = settingsBin.IndexOf(rpx) + rpx.Length;
+            //getting full rpx path from settings.xml
+            string settingsXmlRpxLine = settingsXml.FirstOrDefault(it => it.Contains(rpxFile));
+            string[] settingsXmlRpxLineParts = settingsXmlRpxLine.Split('>')[1].Split('<');
 
-            byte[] tmp = new byte[endOffset - startOffset];
-            Array.Copy(settingsBin, startOffset, tmp, 0, endOffset - startOffset);
-            var chars = Encoding.UTF8.GetChars(tmp);
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < chars.Length; i++)
-            {
-                if (i % 2 == 0)
-                    sb.Append(chars[i]);
-            }
-
-
-
-            gameRpxPath = sb.ToString();
+            gameRpxPath = settingsXmlRpxLineParts[0];
             gameRpxFileInfo = new FileInfo(gameRpxPath);
             updateRpxPath = Path.Combine(cemuExeFile.DirectoryName, "mlc01", "usr", "title", FirstID, SecondID);
 
@@ -231,6 +202,8 @@ namespace CemuStub
         {
             try
             {
+
+
                 PartialSpec gameDone = new PartialSpec("VanguardSpec");
                 gameDone[VSPEC.SYSTEM] = "Wii U";
                 gameDone[VSPEC.GAMENAME] = CemuWatch.gameName;
@@ -323,7 +296,7 @@ namespace CemuStub
                 psi.RedirectStandardError = true;
                 psi.UseShellExecute = false;
                 psi.CreateNoWindow = true;
-                Process p = Process.Start(psi);
+                var p = Process.Start(psi);
 
                 p.WaitForExit();
 
@@ -381,13 +354,15 @@ namespace CemuStub
         internal static void ResetBackup() => CreateRpxBackup(true);
         private static void CreateRpxBackup(bool Recreate = false)
         {
+
+
+
             if (Recreate)
                 if (File.Exists(updateRpxBackup))
                     File.Delete(updateRpxBackup);
 
             if (!File.Exists(updateRpxBackup))
             {
-                Debug.Assert(File.Exists(updateRpxLocation));
                 File.Copy(updateRpxLocation, updateRpxBackup);
             }
         }
@@ -446,23 +421,19 @@ namespace CemuStub
 
         private static Process getCemuProcess()
         {
+
             if (cemuProcess == null)
             {
                 RefreshCemuProcess();
             }
-            //Get a new process object from then pid we have. 
-            try
+            else
             {
-                cemuProcess = Process.GetProcessById(cemuProcess?.Id ?? -1);
+                Process tempP = Process.GetProcesses().FirstOrDefault(it => it?.MainWindowTitle?.Contains(expectedCemuTitle) ?? false);
+
+                if (tempP != null && tempP.MainWindowTitle != cemuProcess.MainWindowTitle)
+                    RefreshCemuProcess(tempP);
+
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                cemuProcess = null;
-            }
-            //If the title is still expectedCemuTitle, we know something else didn't eat the pid 
-            if (!(cemuProcess?.MainWindowTitle.Contains(expectedCemuTitle) ?? false))
-                RefreshCemuProcess();
 
             return cemuProcess;
         }

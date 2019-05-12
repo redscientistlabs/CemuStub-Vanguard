@@ -165,6 +165,10 @@ namespace WindowsFilesVanguard
 
                 throw;
             }
+            finally
+            {
+                CloseStream();
+            }
         }
 
         public string getCompositeFilename(string prefix)
