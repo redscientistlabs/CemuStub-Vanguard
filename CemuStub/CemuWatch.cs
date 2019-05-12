@@ -75,7 +75,7 @@ namespace CemuStub
             if (!LoadCompositeFilenameDico())
                 Application.Exit();
 
-            watch.Interval = 420;
+            watch.Interval = 1500;
             watch.Tick += Watch_Tick;
             watch.Start();
         }
@@ -463,7 +463,6 @@ namespace CemuStub
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
                 cemuProcess = null;
             }
             //If the title is still expectedCemuTitle, we know something else didn't eat the pid 
