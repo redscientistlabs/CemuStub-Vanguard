@@ -220,11 +220,8 @@ namespace WindowsFilesVanguard
 
         public override void ApplyWorkingFile()
         {
-            if (stream != null)
-            {
-                stream.Close();
-                stream = null;
-            }
+
+            CloseStream();
 
             if (CemuWatch.writeCopyMode)
             {
@@ -456,247 +453,255 @@ namespace WindowsFilesVanguard
 
         }
 
-    }
-
-
-    [Serializable()]
-    public class MultipleFileInterface : MemoryInterface
-    {
-        public string Filename;
-        public string ShortFilename;
-
-        public List<FileInterface> FileInterfaces = new List<FileInterface>();
-
-        public MultipleFileInterface(string _targetId)
+        public void CloseStream()
         {
-            try
+            if (stream != null)
             {
-                string[] targetId = _targetId.Split('|');
-
-                for (int i = 0; i < targetId.Length; i++)
-                    FileInterfaces.Add(new FileInterface("File|" + targetId[i]));
-
-                Filename = "MultipleFiles";
-                ShortFilename = "MultipleFiles";
-
-                //SetBackup();
-
-                //getMemoryDump();
-                getMemorySize();
-
-                setFilePositions();
-
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"MultipleFileInterface failed to load something \n\n" + ex.ToString());
-            }
-        }
-
-        public string getCompositeFilename(string prefix)
-        {
-            return string.Join("|", FileInterfaces.Select(it => it.getCompositeFilename(prefix)));
-        }
-
-        public string getCorruptFilename(bool overrideWriteCopyMode = false)
-        {
-            return string.Join("|", FileInterfaces.Select(it => it.getCorruptFilename(overrideWriteCopyMode)));
-
-        }
-
-        public string getBackupFilename()
-        {
-            return string.Join("|", FileInterfaces.Select(it => it.getBackupFilename()));
-        }
-
-        public override void ResetWorkingFile()
-        {
-            foreach (var fi in FileInterfaces)
-                fi.ResetWorkingFile();
-
-        }
-
-        public string SetWorkingFile()
-        {
-            return string.Join("|", FileInterfaces.Select(it => it.SetWorkingFile()));
-
-        }
-
-        public override void ApplyWorkingFile()
-        {
-            foreach (var fi in FileInterfaces)
-                fi.ApplyWorkingFile();
-
-        }
-
-        public override void SetBackup()
-        {
-            foreach (var fi in FileInterfaces)
-                fi.SetBackup();
-
-        }
-
-        public override void ResetBackup(bool askConfirmation = true)
-        {
-            if (askConfirmation && MessageBox.Show("Are you sure you want to reset the backup using the target files?", "WARNING", MessageBoxButtons.YesNo) == DialogResult.No)
-                return;
-
-            foreach (var fi in FileInterfaces)
-                fi.ResetBackup(false);
-
-        }
-
-        public override void RestoreBackup(bool announce = true)
-        {
-
-            foreach (var fi in FileInterfaces)
-                fi.RestoreBackup(false);
-
-            if (announce)
-                MessageBox.Show("Backups of " + string.Join(",", FileInterfaces.Select(it => (it as FileInterface).ShortFilename)) + " were restored");
-
-        }
-
-        public void setFilePositions()
-        {
-
-            long addressPad = 0;
-
-            //find which fileInterface contains the file we want
-            foreach (var fi in FileInterfaces)
-            {
-                fi.MultiFilePosition = addressPad;
-                addressPad += fi.getMemorySize();
-                fi.MultiFilePositionCeiling = addressPad;
-
+                stream.Close();
+                stream = null;
             }
 
         }
 
-        public override void wipeMemoryDump()
+
+        [Serializable()]
+        public class MultipleFileInterface : MemoryInterface
         {
-            for (int i = 0; i < FileInterfaces.Count; i++)
+            public string Filename;
+            public string ShortFilename;
+
+            public List<FileInterface> FileInterfaces = new List<FileInterface>();
+
+            public MultipleFileInterface(string _targetId)
             {
-                FileInterfaces[i].wipeMemoryDump();
-                //GC.Collect();
-                //GC.WaitForFullGCComplete();
-            }
-        }
-
-        public override void getMemoryDump()
-        {
-            long totalDumpSize = 0;
-
-            for (int i = 0; i < FileInterfaces.Count; i++)
-            {
-                totalDumpSize += FileInterfaces[i].lastMemorySize.Value;
-                FileInterfaces[i].getMemoryDump();
-            }
-
-
-        }
-        public override byte[][] lastMemoryDump
-        {
-            get { throw new Exception("FORBIDDEN USE OF LASTMEMORYDUMP ON MULTIPLEFILEINTERFACE"); }
-            set { throw new Exception("FORBIDDEN USE OF LASTMEMORYDUMP ON MULTIPLEFILEINTERFACE"); }
-        }
-
-        public override bool cacheEnabled
-        {
-            get { return FileInterfaces.Count > 0 && FileInterfaces[0].lastMemoryDump != null; }
-        }
-
-        public override long getMemorySize()
-        {
-            long size = 0;
-
-            foreach (var fi in FileInterfaces)
-                size += fi.getMemorySize();
-
-            lastMemorySize = size;
-            return (long)lastMemorySize;
-
-        }
-
-        public override bool dolphinSavestateVersion()
-        {
-            //Not supported for multiple files
-            return false;
-        }
-
-        public override long? lastMemorySize { get; set; }
-
-        public override void PokeBytes(long address, byte[] data)
-        {
-
-            //find which fileInterface contains the file we want
-            for (int i = 0; i < FileInterfaces.Count; i++)
-            {
-                var fi = FileInterfaces[i];
-
-                if (fi.MultiFilePositionCeiling > address)
+                try
                 {
-                    fi.PokeBytes(address - fi.MultiFilePosition, data);
-                    return;
+                    string[] targetId = _targetId.Split('|');
+
+                    for (int i = 0; i < targetId.Length; i++)
+                        FileInterfaces.Add(new FileInterface("File|" + targetId[i]));
+
+                    Filename = "MultipleFiles";
+                    ShortFilename = "MultipleFiles";
+
+                    //SetBackup();
+
+                    //getMemoryDump();
+                    getMemorySize();
+
+                    setFilePositions();
+
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"MultipleFileInterface failed to load something \n\n" + ex.ToString());
                 }
             }
 
-        }
-
-        public override void PokeByte(long address, byte data)
-        {
-
-            //find which fileInterface contains the file we want
-            for (int i = 0; i < FileInterfaces.Count; i++)
+            public string getCompositeFilename(string prefix)
             {
-                var fi = FileInterfaces[i];
+                return string.Join("|", FileInterfaces.Select(it => it.getCompositeFilename(prefix)));
+            }
 
-                if (fi.MultiFilePositionCeiling > address)
-                {
-                    fi.PokeByte(address - fi.MultiFilePosition, data);
+            public string getCorruptFilename(bool overrideWriteCopyMode = false)
+            {
+                return string.Join("|", FileInterfaces.Select(it => it.getCorruptFilename(overrideWriteCopyMode)));
+
+            }
+
+            public string getBackupFilename()
+            {
+                return string.Join("|", FileInterfaces.Select(it => it.getBackupFilename()));
+            }
+
+            public override void ResetWorkingFile()
+            {
+                foreach (var fi in FileInterfaces)
+                    fi.ResetWorkingFile();
+
+            }
+
+            public string SetWorkingFile()
+            {
+                return string.Join("|", FileInterfaces.Select(it => it.SetWorkingFile()));
+
+            }
+
+            public override void ApplyWorkingFile()
+            {
+                foreach (var fi in FileInterfaces)
+                    fi.ApplyWorkingFile();
+
+            }
+
+            public override void SetBackup()
+            {
+                foreach (var fi in FileInterfaces)
+                    fi.SetBackup();
+
+            }
+
+            public override void ResetBackup(bool askConfirmation = true)
+            {
+                if (askConfirmation && MessageBox.Show("Are you sure you want to reset the backup using the target files?", "WARNING", MessageBoxButtons.YesNo) == DialogResult.No)
                     return;
+
+                foreach (var fi in FileInterfaces)
+                    fi.ResetBackup(false);
+
+            }
+
+            public override void RestoreBackup(bool announce = true)
+            {
+
+                foreach (var fi in FileInterfaces)
+                    fi.RestoreBackup(false);
+
+                if (announce)
+                    MessageBox.Show("Backups of " + string.Join(",", FileInterfaces.Select(it => (it as FileInterface).ShortFilename)) + " were restored");
+
+            }
+
+            public void setFilePositions()
+            {
+
+                long addressPad = 0;
+
+                //find which fileInterface contains the file we want
+                foreach (var fi in FileInterfaces)
+                {
+                    fi.MultiFilePosition = addressPad;
+                    addressPad += fi.getMemorySize();
+                    fi.MultiFilePositionCeiling = addressPad;
+
+                }
+
+            }
+
+            public override void wipeMemoryDump()
+            {
+                for (int i = 0; i < FileInterfaces.Count; i++)
+                {
+                    FileInterfaces[i].wipeMemoryDump();
+                    //GC.Collect();
+                    //GC.WaitForFullGCComplete();
                 }
             }
 
-        }
-
-        public override byte PeekByte(long address)
-        {
-
-            //find which fileInterface contains the file we want
-            for (int i = 0; i < FileInterfaces.Count; i++)
+            public override void getMemoryDump()
             {
-                var fi = FileInterfaces[i];
+                long totalDumpSize = 0;
 
-                if (fi.MultiFilePositionCeiling > address)
-                    return fi.PeekByte(address - fi.MultiFilePosition);
+                for (int i = 0; i < FileInterfaces.Count; i++)
+                {
+                    totalDumpSize += FileInterfaces[i].lastMemorySize.Value;
+                    FileInterfaces[i].getMemoryDump();
+                }
+
+
+            }
+            public override byte[][] lastMemoryDump
+            {
+                get { throw new Exception("FORBIDDEN USE OF LASTMEMORYDUMP ON MULTIPLEFILEINTERFACE"); }
+                set { throw new Exception("FORBIDDEN USE OF LASTMEMORYDUMP ON MULTIPLEFILEINTERFACE"); }
             }
 
-            //if wasn't found
-            return 0;
-
-
-        }
-
-        public override byte[] PeekBytes(long address, int range)
-        {
-
-            //find which fileInterface contains the file we want
-            for (int i = 0; i < FileInterfaces.Count; i++)
+            public override bool cacheEnabled
             {
-                var fi = FileInterfaces[i];
-
-                if (fi.MultiFilePositionCeiling > address)
-                    return fi.PeekBytes(address - fi.MultiFilePosition, range);
+                get { return FileInterfaces.Count > 0 && FileInterfaces[0].lastMemoryDump != null; }
             }
 
-            //if wasn't found
-            return null;
+            public override long getMemorySize()
+            {
+                long size = 0;
+
+                foreach (var fi in FileInterfaces)
+                    size += fi.getMemorySize();
+
+                lastMemorySize = size;
+                return (long)lastMemorySize;
+
+            }
+
+            public override bool dolphinSavestateVersion()
+            {
+                //Not supported for multiple files
+                return false;
+            }
+
+            public override long? lastMemorySize { get; set; }
+
+            public override void PokeBytes(long address, byte[] data)
+            {
+
+                //find which fileInterface contains the file we want
+                for (int i = 0; i < FileInterfaces.Count; i++)
+                {
+                    var fi = FileInterfaces[i];
+
+                    if (fi.MultiFilePositionCeiling > address)
+                    {
+                        fi.PokeBytes(address - fi.MultiFilePosition, data);
+                        return;
+                    }
+                }
+
+            }
+
+            public override void PokeByte(long address, byte data)
+            {
+
+                //find which fileInterface contains the file we want
+                for (int i = 0; i < FileInterfaces.Count; i++)
+                {
+                    var fi = FileInterfaces[i];
+
+                    if (fi.MultiFilePositionCeiling > address)
+                    {
+                        fi.PokeByte(address - fi.MultiFilePosition, data);
+                        return;
+                    }
+                }
+
+            }
+
+            public override byte PeekByte(long address)
+            {
+
+                //find which fileInterface contains the file we want
+                for (int i = 0; i < FileInterfaces.Count; i++)
+                {
+                    var fi = FileInterfaces[i];
+
+                    if (fi.MultiFilePositionCeiling > address)
+                        return fi.PeekByte(address - fi.MultiFilePosition);
+                }
+
+                //if wasn't found
+                return 0;
+
+
+            }
+
+            public override byte[] PeekBytes(long address, int range)
+            {
+
+                //find which fileInterface contains the file we want
+                for (int i = 0; i < FileInterfaces.Count; i++)
+                {
+                    var fi = FileInterfaces[i];
+
+                    if (fi.MultiFilePositionCeiling > address)
+                        return fi.PeekBytes(address - fi.MultiFilePosition, range);
+                }
+
+                //if wasn't found
+                return null;
+
+            }
 
         }
 
     }
-
-
 }

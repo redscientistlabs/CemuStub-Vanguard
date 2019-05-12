@@ -125,9 +125,11 @@ namespace Vanguard
             partial[VSPEC.MEMORYDOMAINS_BLACKLISTEDDOMAINS] = new string[] { };
             partial[VSPEC.MEMORYDOMAINS_INTERFACES] = new MemoryDomainProxy[] { };
             partial[VSPEC.CORE_LASTLOADERROM] = -1;
-            partial[VSPEC.SUPPORTS_RENDERING] = true;
-            partial[VSPEC.SUPPORTS_CONFIG_MANAGEMENT] = true;
-            partial[VSPEC.SUPPORTS_CONFIG_HANDOFF] = true;
+            partial[VSPEC.SUPPORTS_RENDERING] = false;
+            partial[VSPEC.SUPPORTS_CONFIG_MANAGEMENT] = false;
+            partial[VSPEC.SUPPORTS_CONFIG_HANDOFF] = false;
+            partial[VSPEC.SUPPORTS_SAVESTATES] = false;
+            partial[VSPEC.SUPPORTS_REALTIME] = false;
             //partial[VSPEC.CONFIG_PATHS] = new[] { Path.Combine(emuDir, "config.ini") };
 
             return partial;

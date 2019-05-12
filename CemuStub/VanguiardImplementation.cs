@@ -102,8 +102,17 @@ namespace Vanguard
                         }
 
                     case REMOTE_LOADROM:
+                            //skip
+                        break;
+
+                    case REMOTE_PRECORRUPTACTION:
+                        CemuWatch.KillCemuProcess();
+                        CemuWatch.RestoreBackup();
+                        break;
+
+                    case REMOTE_POSTCORRUPTACTION:
                         {
-                            var fileName = advancedMessage.objectValue as String;
+                            //var fileName = advancedMessage.objectValue as String;
                             SyncObjectSingleton.FormExecute((o, ea) =>
                             {
                                 CemuWatch.StartRpx();
@@ -112,6 +121,7 @@ namespace Vanguard
 
                         }
                         break;
+
                     case REMOTE_CLOSEGAME:
                         {
                             SyncObjectSingleton.FormExecute((o, ea) =>

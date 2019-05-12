@@ -117,10 +117,8 @@ namespace CemuStub
 
         private static void LoadRpxFileInterface()
         {
-            fileInterfaceTargetId = "File|" + gameRpxFileInfo.FullName;
+            fileInterfaceTargetId = "File|" + updateRpxLocation;
             rpxInterface = new FileInterface(fileInterfaceTargetId);
-
-
         }
 
         private static void FetchBaseInfoFromCemuProcess()
@@ -146,6 +144,8 @@ namespace CemuStub
 
         internal static void KillCemuProcess()
         {
+            if (cemuProcess == null)
+                return;
 
             var p = cemuProcess;
             //killing cemu
@@ -189,8 +189,8 @@ namespace CemuStub
             updateCodePath = Path.Combine(updateRpxPath, "code");
             updateMetaPath = Path.Combine(updateRpxPath, "meta");
 
-            DirectoryInfo updateCodeDirectoryInfo = new DirectoryInfo(updateCodePath);
-            updateCodeFiles = updateCodeDirectoryInfo.GetFiles();
+
+
             updateRpxLocation = Path.Combine(updateCodePath, rpxFile);
             updateRpxCompressed = Path.Combine(updateCodePath, "compressed_" + rpxFile);
             updateRpxBackup = Path.Combine(updateCodePath, "backup_" + rpxFile);
@@ -218,6 +218,9 @@ namespace CemuStub
 
                 //This is local. If the domains changed it propgates over netcore
                 LocalNetCoreRouter.Route(NetcoreCommands.CORRUPTCORE, NetcoreCommands.REMOTE_EVENT_DOMAINSUPDATED, true, true);
+
+                //Asks RTC to restrict any features unsupported by the stub
+                LocalNetCoreRouter.Route(NetcoreCommands.CORRUPTCORE, NetcoreCommands.REMOTE_EVENT_RESTRICTFEATURES, true, true);
 
             }
             catch (Exception ex)
@@ -266,7 +269,7 @@ namespace CemuStub
                 Directory.CreateDirectory(updateMetaPath);
 
                 foreach (var file in gameRpxFileInfo.Directory.GetFiles())
-                    File.Copy(file.FullName, updateCodePath);
+                    File.Copy(file.FullName, Path.Combine(updateCodePath, file.Name));
 
                 DirectoryInfo gameDirectoryInfo = gameRpxFileInfo.Directory.Parent;
                 DirectoryInfo metaDirectoryInfo = new DirectoryInfo(updateMetaPath);
@@ -277,6 +280,9 @@ namespace CemuStub
             }
 
             //Uncompress update rpx if it isn't already
+
+            DirectoryInfo updateCodeDirectoryInfo = new DirectoryInfo(updateCodePath);
+            updateCodeFiles = updateCodeDirectoryInfo.GetFiles();
 
             if (updateCodeFiles.FirstOrDefault(it => it.Name == "UNCOMPRESSED.txt") == null)
             {
@@ -346,6 +352,9 @@ namespace CemuStub
         internal static void ResetBackup() => CreateRpxBackup(true);
         private static void CreateRpxBackup(bool Recreate = false)
         {
+
+
+
             if (Recreate)
                 if (File.Exists(updateRpxBackup))
                     File.Delete(updateRpxBackup);
@@ -358,6 +367,8 @@ namespace CemuStub
 
         internal static void StartRpx()
         {
+            rpxInterface.ApplyWorkingFile();
+
             ProcessStartInfo psi = new ProcessStartInfo();
             psi.FileName = CemuExeLocation;
             psi.WorkingDirectory = new FileInfo(CemuExeLocation).DirectoryName;
@@ -394,6 +405,8 @@ namespace CemuStub
 
         internal static void RestoreBackup()
         {
+            rpxInterface.CloseStream();
+
             if (File.Exists(updateRpxBackup))
             {
                 if (File.Exists(updateRpxLocation))
@@ -446,6 +459,7 @@ namespace CemuStub
             S.GET<CS_Core_Form>().btnResetBackup.Enabled = true;
             S.GET<CS_Core_Form>().btnRestoreBackup.Enabled = true;
             S.GET<CS_Core_Form>().btnStartRpx.Enabled = true;
+            S.GET<CS_Core_Form>().btnReconstructFakeUpdate.Enabled = true;
         }
 
         public static void DisableButtons()
@@ -453,6 +467,7 @@ namespace CemuStub
             S.GET<CS_Core_Form>().btnResetBackup.Enabled = false;
             S.GET<CS_Core_Form>().btnRestoreBackup.Enabled = false;
             S.GET<CS_Core_Form>().btnStartRpx.Enabled = false;
+            S.GET<CS_Core_Form>().btnReconstructFakeUpdate.Enabled = false;
         }
 
     }

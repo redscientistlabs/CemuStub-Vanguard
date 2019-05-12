@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CS_Core_Form));
             this.label1 = new System.Windows.Forms.Label();
             this.lbCemuStatus = new System.Windows.Forms.Label();
             this.btnRestoreBackup = new System.Windows.Forms.Button();
@@ -181,7 +182,7 @@
             this.label3.ForeColor = System.Drawing.Color.White;
             this.label3.Location = new System.Drawing.Point(12, 21);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(100, 13);
+            this.label3.Size = new System.Drawing.Size(97, 13);
             this.label3.TabIndex = 8;
             this.label3.Text = "Targeted RPX File:";
             // 
@@ -199,6 +200,7 @@
             this.Controls.Add(this.lbCemuStatus);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "CS_Core_Form";
             this.Text = "Cemu Stub";
