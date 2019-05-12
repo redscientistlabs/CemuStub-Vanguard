@@ -131,6 +131,7 @@ namespace Vanguard
             partial[VSPEC.SUPPORTS_SAVESTATES] = false;
             partial[VSPEC.SUPPORTS_REALTIME] = false;
             partial[VSPEC.SUPPORTS_KILLSWITCH] = false;
+            partial[VSPEC.SUPPORTS_MIXED_STOCKPILE] = false;
             //partial[VSPEC.CONFIG_PATHS] = new[] { Path.Combine(emuDir, "config.ini") };
 
             return partial;
