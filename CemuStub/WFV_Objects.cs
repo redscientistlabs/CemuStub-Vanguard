@@ -153,7 +153,7 @@ namespace WindowsFilesVanguard
                 }
 
 
-                SetBackup();
+                //SetBackup();
 
                 //getMemoryDump();
                 getMemorySize();
@@ -212,10 +212,12 @@ namespace WindowsFilesVanguard
 
         public string SetWorkingFile()
         {
-            if (!File.Exists(getCorruptFilename()))
-                File.Copy(getBackupFilename(), getCorruptFilename(), true);
+            string corruptFilename = getCorruptFilename();
 
-            return getCorruptFilename();
+            if (!File.Exists(corruptFilename))
+                File.Copy(getBackupFilename(), corruptFilename, true);
+
+            return corruptFilename;
         }
 
         public override void ApplyWorkingFile()
