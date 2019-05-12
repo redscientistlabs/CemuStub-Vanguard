@@ -296,7 +296,9 @@ namespace CemuStub
                 psi.RedirectStandardError = true;
                 psi.UseShellExecute = false;
                 psi.CreateNoWindow = true;
-                Process.Start(psi);
+                var p = Process.Start(psi);
+
+                p.WaitForExit();
 
                 File.WriteAllText(Path.Combine(updateCodePath, "UNCOMPRESSED.txt"), "DONE");
             }
