@@ -17,6 +17,7 @@ namespace Vanguard
     public static class VanguardCore
     {
         public static string[] args;
+        public static bool vanguardStarted = false;
 
         internal static DialogResult ShowErrorDialog(Exception exception, bool canContinue = false)
         {
@@ -165,8 +166,12 @@ namespace Vanguard
         }
 
         //This is the entry point of RTC. Without this method, nothing will load.
+        
         public static void Start()
         {
+
+            vanguardStarted = true;
+
             //Grab an object on the main thread to use for netcore invokes
             SyncObjectSingleton.SyncObject = S.GET<CS_Core_Form>();
             SyncObjectSingleton.EmuThreadIsMainThread = true;

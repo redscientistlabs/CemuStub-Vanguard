@@ -36,7 +36,7 @@ namespace CemuStub
 
         //File management
         public static Dictionary<String, String> CompositeFilenameDico = null;
-        private static string CemuStubVersion = "0.01";
+        public static string CemuStubVersion = "0.02";
 
 
         public static void Start()

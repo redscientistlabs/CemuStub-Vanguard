@@ -289,7 +289,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "CS_Core_Form";
-            this.Text = "Cemu Stub";
+            this.Text = "Cemu Stub ";
             this.Load += new System.EventHandler(this.CS_Core_Form_Load);
             this.pnSideBar.ResumeLayout(false);
             this.pnSideBar.PerformLayout();

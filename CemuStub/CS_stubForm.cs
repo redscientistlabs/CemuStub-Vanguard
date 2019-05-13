@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Vanguard;
 
 namespace CemuStub
 {
@@ -16,7 +17,7 @@ namespace CemuStub
         public CS_Core_Form()
         {
             InitializeComponent();
-            
+            Text += CemuWatch.CemuStubVersion;
         }
 
         private void BtnRestartStub_Click(object sender, EventArgs e)
@@ -67,6 +68,11 @@ namespace CemuStub
             }
 
             CemuWatch.SelectGame(selected);
+
+            if(!VanguardCore.vanguardStarted)
+                VanguardCore.Start();
+            else
+                CemuWatch.UpdateDomains();
 
         }
 
