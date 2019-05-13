@@ -16,6 +16,7 @@ namespace CemuStub
         public CS_Core_Form()
         {
             InitializeComponent();
+            
         }
 
         private void BtnRestartStub_Click(object sender, EventArgs e)
@@ -49,7 +50,29 @@ namespace CemuStub
 
         private void CS_Core_Form_Load(object sender, EventArgs e)
         {
-            CemuWatch.Start();
+            cbSelectedGame.SelectedIndex = 0;
+            CemuWatch.LoadKnownGames();
+        }
+
+        private void CbSelectedGame_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (CemuWatch.DontSelectGame)
+                return;
+
+            string selected = cbSelectedGame.SelectedItem.ToString();
+            if (selected == "Autodetect")
+            { 
+                CemuWatch.Start();
+                return;
+            }
+
+            CemuWatch.SelectGame(selected);
+
+        }
+
+        private void BtnUnmodSelectedGame_Click(object sender, EventArgs e)
+        {
+            CemuWatch.UnmodGame();
         }
     }
 }

@@ -10,10 +10,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.IO;
-using CemuStub;
 using RTCV.CorruptCore;
 
-namespace WindowsFilesVanguard
+namespace CemuStub
 {
 
     public class LabelPassthrough : Label
@@ -710,4 +709,30 @@ namespace WindowsFilesVanguard
         }
 
     }
+
+    public class CemuGameInfo
+    {
+        public FileInfo gameRpxFileInfo = null;
+        public FileInfo cemuExeFile = null;
+        public FileInfo[] updateCodeFiles = null;
+        public string rpxFile = null;
+        public string gameRpxPath = null;
+        public string updateRpxPath = null;
+        public string updateCodePath = null;
+        public string updateMetaPath = null;
+        public string updateRpxLocation = null;
+        public string updateRpxCompressed = null;
+        public string updateRpxBackup = null;
+        public string CemuExeLocation;
+        public string FirstID = null;
+        public string SecondID = null;
+        public string fileInterfaceTargetId = null;
+        public string gameName = "No game";
+
+        public override string ToString()
+        {
+            return gameName;
+        }
+    }
+
 }

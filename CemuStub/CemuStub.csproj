@@ -71,7 +71,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VanguardCore.cs" />
     <Compile Include="VanguiardImplementation.cs" />
-    <Compile Include="WFV_Objects.cs">
+    <Compile Include="CS_Objects.cs">
       <SubType>Component</SubType>
     </Compile>
     <EmbeddedResource Include="CS_stubForm.resx">

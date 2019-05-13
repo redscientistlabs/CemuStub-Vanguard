@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WindowsFilesVanguard
+namespace CemuStub
 {
     static class WFV_MemoryBanks
     {

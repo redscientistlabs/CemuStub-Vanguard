@@ -70,7 +70,7 @@ namespace Vanguard
                     case REMOTE_ALLSPECSSENT:
                         {
                             //We still need to set the emulator's path
-                            AllSpec.VanguardSpec.Update(VSPEC.EMUDIR, CemuWatch.cemuExeFile.Directory.FullName);
+                            AllSpec.VanguardSpec.Update(VSPEC.EMUDIR, CemuWatch.currentGameInfo.cemuExeFile.Directory.FullName);
                             SyncObjectSingleton.FormExecute((o, ea) =>
                             {
                                 CemuWatch.UpdateDomains();

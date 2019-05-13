@@ -12,34 +12,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Vanguard;
-using WindowsFilesVanguard;
+using CemuStub;
 
 namespace CemuStub
 {
     public static class CemuWatch
     {
-        static Timer watch = new Timer();
+        static Timer watch = null;
         public static string expectedCemuTitle = "Cemu 1.15.6c";
         public static string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
+        public static Dictionary<string, CemuGameInfo> knownGamesDico = new Dictionary<string, CemuGameInfo>();
+        public static CemuGameInfo currentGameInfo = new CemuGameInfo();
 
-        static FileInfo gameRpxFileInfo = null;
-        public static FileInfo cemuExeFile = null;
-        static FileInfo[] updateCodeFiles = null;
-
-        static string rpxFile = null;
-        static string gameRpxPath = null;
-        static string updateRpxPath = null;
-        static string updateCodePath = null;
-        static string updateMetaPath = null;
-        static string updateRpxLocation = null;
-        static string updateRpxCompressed = null;
-        static string updateRpxBackup = null;
-        static string CemuExeLocation;
-        static string FirstID = null;
-        static string SecondID = null;
-        static string fileInterfaceTargetId = null;
-
+        public static bool DontSelectGame = false;
 
         static CemuState state = CemuState.UNFOUND;
 
@@ -51,10 +37,27 @@ namespace CemuStub
         //File management
         public static Dictionary<String, String> CompositeFilenameDico = null;
         private static string CemuStubVersion = "0.01";
-        private static string gameName = null;
+
 
         public static void Start()
         {
+            if (watch != null)
+            {
+                watch.Stop();
+                watch = null;
+
+            }
+
+            CemuWatch.currentGameInfo = new CemuGameInfo();
+
+            S.GET<CS_Core_Form>().lbCemuStatus.Text = "Waiting for Cemu";
+            S.GET<CS_Core_Form>().lbTargetedGameId.Text = "";
+            S.GET<CS_Core_Form>().lbTargetedGameRpx.Text = "No game selected. Cemu Stub will auto-detect and prepare any game you load in Cemu.";
+
+            DisableButtons();
+
+
+
             if (!Directory.Exists(CemuWatch.currentDir + "\\TEMP\\"))
                 Directory.CreateDirectory(CemuWatch.currentDir + "\\TEMP\\");
 
@@ -75,9 +78,56 @@ namespace CemuStub
             if (!LoadCompositeFilenameDico())
                 Application.Exit();
 
+            watch = new Timer();
             watch.Interval = 1500;
             watch.Tick += Watch_Tick;
             watch.Start();
+        }
+
+        internal static void UnmodGame()
+        {
+            KillCemuProcess();
+
+            //remove item from known games and go back to autodetect
+            var lastRef = CemuWatch.currentGameInfo;
+            CompositeFilenameDico.Remove(lastRef.gameName);
+            SaveKnownGames();
+            S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = 0;
+            S.GET<CS_Core_Form>().cbSelectedGame.Items.Remove(lastRef.gameName);
+
+            //remove fake update from game
+            if(Directory.Exists(lastRef.updateRpxPath))
+                Directory.Delete(lastRef.updateRpxPath, true);
+        }
+
+        internal static void SelectGame(string selected = null)
+        {
+            if (selected != null)
+                currentGameInfo = knownGamesDico[selected];
+
+            string rpxFullPath = currentGameInfo.gameRpxFileInfo.FullName;
+            if (!File.Exists(rpxFullPath))
+            {
+                string message = "Cemu Stub couldn't find the Rpx file for this game. Would you like to remove this entry?";
+                var result = MessageBox.Show(message, "Error finding game", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+
+                if(result == DialogResult.Yes)
+                    UnmodGame();
+
+                S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = 0;
+
+                return;
+            }
+
+            LoadRpxFileInterface();
+
+            state = CemuState.READY;
+            S.GET<CS_Core_Form>().lbCemuStatus.Text = "Ready for corrupting";
+            S.GET<CS_Core_Form>().lbTargetedGameRpx.Text = currentGameInfo.gameRpxFileInfo.FullName;
+            S.GET<CS_Core_Form>().lbTargetedGameId.Text = "Game ID: " + currentGameInfo.FirstID + "-" + currentGameInfo.SecondID;
+            EnableButtons();
+
+
         }
 
         private static void Watch_Tick(object sender, EventArgs e)
@@ -101,12 +151,16 @@ namespace CemuStub
                 PrepareUpdateFolder();
                 CreateRpxBackup();
 
-                LoadRpxFileInterface();
+                knownGamesDico[currentGameInfo.gameName] = currentGameInfo;
 
-                state = CemuState.READY;
-                S.GET<CS_Core_Form>().lbCemuStatus.Text = "Ready for corrupting";
-                S.GET<CS_Core_Form>().lbTargetedGame.Text = fileInterfaceTargetId;
-                EnableButtons();
+                SelectGame();
+
+                DontSelectGame = true;
+                S.GET<CS_Core_Form>().cbSelectedGame.Items.Add(currentGameInfo.gameName);
+                S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = S.GET<CS_Core_Form>().cbSelectedGame.Items.Count - 1;
+                DontSelectGame = false;
+
+                SaveKnownGames();
 
                 VanguardCore.Start();
 
@@ -114,10 +168,58 @@ namespace CemuStub
 
         }
 
+        public static bool LoadKnownGames()
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            string path = Path.Combine(CemuWatch.currentDir + "\\PARAMS\\" + "knowngames.json");
+            if (!File.Exists(path))
+            {
+                knownGamesDico = new Dictionary<string, CemuGameInfo>();
+                return true;
+            }
+            try
+            {
+
+                using (StreamReader sw = new StreamReader(path))
+                using (JsonTextReader reader = new JsonTextReader(sw))
+                {
+                    knownGamesDico = serializer.Deserialize<Dictionary<string, CemuGameInfo>>(reader);
+                }
+
+                foreach (var key in knownGamesDico.Keys)
+                    S.GET<CS_Core_Form>().cbSelectedGame.Items.Add(key);
+            }
+            catch (IOException e)
+            {
+                MessageBox.Show("Unable to access the filemap! Figure out what's locking it and then restart the WGH.\n" + e.ToString());
+                return false;
+            }
+            return true;
+        }
+        public static bool SaveKnownGames()
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            var path = CemuWatch.currentDir + "\\PARAMS\\" + "knowngames.json";
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(path))
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    serializer.Serialize(writer, knownGamesDico);
+                }
+            }
+            catch (IOException e)
+            {
+                MessageBox.Show("Unable to access the known games!\n" + e.ToString());
+                return false;
+            }
+            return true;
+        }
+
         private static void LoadRpxFileInterface()
         {
-            fileInterfaceTargetId = "File|" + updateRpxLocation;
-            rpxInterface = new FileInterface(fileInterfaceTargetId);
+            currentGameInfo.fileInterfaceTargetId = "File|" + currentGameInfo.updateRpxLocation;
+            rpxInterface = new FileInterface(currentGameInfo.fileInterfaceTargetId);
         }
 
         private static void FetchBaseInfoFromCemuProcess()
@@ -132,12 +234,12 @@ namespace CemuStub
             string TitleNumberPart = TitleNumberPartLong.Split(']')[0];
             string TitleGameNamePart = TitleNumberPartLong.Split(']')[1];
 
-            FirstID = TitleNumberPart.Split('-')[0].Trim();
-            SecondID = TitleNumberPart.Split('-')[1].Trim();
-            CemuExeLocation = cemuProcess.MainModule.FileName;
-            cemuExeFile = new FileInfo(CemuExeLocation);
+            currentGameInfo.FirstID = TitleNumberPart.Split('-')[0].Trim();
+            currentGameInfo.SecondID = TitleNumberPart.Split('-')[1].Trim();
+            currentGameInfo.CemuExeLocation = cemuProcess.MainModule.FileName;
+            currentGameInfo.cemuExeFile = new FileInfo(currentGameInfo.CemuExeLocation);
 
-            gameName = TitleGameNamePart.Trim();
+            currentGameInfo.gameName = TitleGameNamePart.Trim();
 
         }
 
@@ -151,7 +253,7 @@ namespace CemuStub
             {
                 ProcessStartInfo psi = new ProcessStartInfo();
                 psi.FileName = "taskkill";
-                psi.Arguments = $"/F /IM {cemuExeFile.Name} /T";
+                psi.Arguments = $"/F /IM {currentGameInfo.cemuExeFile.Name} /T";
                 psi.RedirectStandardOutput = true;
                 psi.RedirectStandardError = true;
                 psi.UseShellExecute = false;
@@ -185,16 +287,16 @@ namespace CemuStub
             ///gathering data from log.txt and settings.xml files
             ///
 
-            string[] logTxt = File.ReadAllLines(Path.Combine(cemuExeFile.DirectoryName, "log.txt"));
+            string[] logTxt = File.ReadAllLines(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "log.txt"));
             //string[] settingsXml = File.ReadAllLines(Path.Combine(cemuExeFile.DirectoryName, "settings.xml"));
-            byte[] settingsBin = File.ReadAllBytes(Path.Combine(cemuExeFile.DirectoryName, "settings.bin"));
+            byte[] settingsBin = File.ReadAllBytes(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "settings.bin"));
 
 
 
             //getting rpx filename from log.txt
             string logLoadingLine = logTxt.FirstOrDefault(it => it.Contains("Loading") && it.Contains(".rpx"));
             string[] logLoadingLineParts = logLoadingLine.Split(' ');
-            rpxFile = logLoadingLineParts[logLoadingLineParts.Length - 1];
+            currentGameInfo.rpxFile = logLoadingLineParts[logLoadingLineParts.Length - 1];
 
             //Getting rpx path from settings.bin
             byte[] rpx = { 0x2E, 0x00, 0x72, 0x00, 0x70, 0x00, 0x78 }; //".rpx" with the extra characters
@@ -213,18 +315,18 @@ namespace CemuStub
 
 
 
-            gameRpxPath = sb.ToString();
-            gameRpxFileInfo = new FileInfo(gameRpxPath);
-            updateRpxPath = Path.Combine(cemuExeFile.DirectoryName, "mlc01", "usr", "title", FirstID, SecondID);
+            currentGameInfo.gameRpxPath = sb.ToString();
+            currentGameInfo.gameRpxFileInfo = new FileInfo(currentGameInfo.gameRpxPath);
+            currentGameInfo.updateRpxPath = Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "mlc01", "usr", "title", currentGameInfo.FirstID, currentGameInfo.SecondID);
 
-            updateCodePath = Path.Combine(updateRpxPath, "code");
-            updateMetaPath = Path.Combine(updateRpxPath, "meta");
+            currentGameInfo.updateCodePath = Path.Combine(currentGameInfo.updateRpxPath, "code");
+            currentGameInfo.updateMetaPath = Path.Combine(currentGameInfo.updateRpxPath, "meta");
 
 
 
-            updateRpxLocation = Path.Combine(updateCodePath, rpxFile);
-            updateRpxCompressed = Path.Combine(updateCodePath, "compressed_" + rpxFile);
-            updateRpxBackup = Path.Combine(updateCodePath, "backup_" + rpxFile);
+            currentGameInfo.updateRpxLocation = Path.Combine(currentGameInfo.updateCodePath, currentGameInfo.rpxFile);
+            currentGameInfo.updateRpxCompressed = Path.Combine(currentGameInfo.updateCodePath, "compressed_" + currentGameInfo.rpxFile);
+            currentGameInfo.updateRpxBackup = Path.Combine(currentGameInfo.updateCodePath, "backup_" + currentGameInfo.rpxFile);
 
 
         }
@@ -237,11 +339,11 @@ namespace CemuStub
 
                 PartialSpec gameDone = new PartialSpec("VanguardSpec");
                 gameDone[VSPEC.SYSTEM] = "Wii U";
-                gameDone[VSPEC.GAMENAME] = CemuWatch.gameName;
+                gameDone[VSPEC.GAMENAME] = CemuWatch.currentGameInfo.gameName;
                 gameDone[VSPEC.SYSTEMPREFIX] = "Cemu";
                 gameDone[VSPEC.SYSTEMCORE] = "Cemu";
                 //gameDone[VSPEC.SYNCSETTINGS] = BIZHAWK_GETSET_SYNCSETTINGS;
-                gameDone[VSPEC.OPENROMFILENAME] = gameRpxFileInfo.FullName;
+                gameDone[VSPEC.OPENROMFILENAME] = currentGameInfo.gameRpxFileInfo.FullName;
                 gameDone[VSPEC.MEMORYDOMAINS_BLACKLISTEDDOMAINS] = new string[0];
                 gameDone[VSPEC.MEMORYDOMAINS_INTERFACES] = GetInterfaces();
                 gameDone[VSPEC.CORE_DISKBASED] = false;
@@ -288,41 +390,41 @@ namespace CemuStub
         internal static void PrepareUpdateFolder(bool overwrite = false)
         {
             if (overwrite)
-                if (Directory.Exists(updateRpxPath))
-                    Directory.Delete(updateRpxPath,true);
+                if (Directory.Exists(currentGameInfo.updateRpxPath))
+                    Directory.Delete(currentGameInfo.updateRpxPath,true);
 
 
             //Creating fake update if update doesn't already exist
-            if (!Directory.Exists(updateRpxPath))
+            if (!Directory.Exists(currentGameInfo.updateRpxPath))
             {
-                Directory.CreateDirectory(updateRpxPath);
-                Directory.CreateDirectory(updateCodePath);
-                Directory.CreateDirectory(updateMetaPath);
+                Directory.CreateDirectory(currentGameInfo.updateRpxPath);
+                Directory.CreateDirectory(currentGameInfo.updateCodePath);
+                Directory.CreateDirectory(currentGameInfo.updateMetaPath);
 
-                foreach (var file in gameRpxFileInfo.Directory.GetFiles())
-                    File.Copy(file.FullName, Path.Combine(updateCodePath, file.Name));
+                foreach (var file in currentGameInfo.gameRpxFileInfo.Directory.GetFiles())
+                    File.Copy(file.FullName, Path.Combine(currentGameInfo.updateCodePath, file.Name));
 
-                DirectoryInfo gameDirectoryInfo = gameRpxFileInfo.Directory.Parent;
-                DirectoryInfo metaDirectoryInfo = new DirectoryInfo(updateMetaPath);
+                DirectoryInfo gameDirectoryInfo = currentGameInfo.gameRpxFileInfo.Directory.Parent;
+                DirectoryInfo metaDirectoryInfo = new DirectoryInfo(currentGameInfo.updateMetaPath);
 
                 foreach (var file in metaDirectoryInfo.GetFiles())
-                    File.Copy(file.FullName, updateMetaPath);
+                    File.Copy(file.FullName, currentGameInfo.updateMetaPath);
 
             }
 
             //Uncompress update rpx if it isn't already
 
-            DirectoryInfo updateCodeDirectoryInfo = new DirectoryInfo(updateCodePath);
-            updateCodeFiles = updateCodeDirectoryInfo.GetFiles();
+            DirectoryInfo updateCodeDirectoryInfo = new DirectoryInfo(currentGameInfo.updateCodePath);
+            currentGameInfo.updateCodeFiles = updateCodeDirectoryInfo.GetFiles();
 
-            if (updateCodeFiles.FirstOrDefault(it => it.Name == "UNCOMPRESSED.txt") == null)
+            if (currentGameInfo.updateCodeFiles.FirstOrDefault(it => it.Name == "UNCOMPRESSED.txt") == null)
             {
-                File.Move(updateRpxLocation, updateRpxCompressed);
+                File.Move(currentGameInfo.updateRpxLocation, currentGameInfo.updateRpxCompressed);
 
                 ProcessStartInfo psi = new ProcessStartInfo();
                 psi.FileName = Path.Combine(currentDir, "wiiurpxtool.exe");
                 psi.WorkingDirectory = currentDir;
-                psi.Arguments = $"-d \"{updateRpxCompressed}\" \"{updateRpxLocation}\"";
+                psi.Arguments = $"-d \"{currentGameInfo.updateRpxCompressed}\" \"{currentGameInfo.updateRpxLocation}\"";
                 psi.RedirectStandardOutput = true;
                 psi.RedirectStandardError = true;
                 psi.UseShellExecute = false;
@@ -331,7 +433,7 @@ namespace CemuStub
 
                 p.WaitForExit();
 
-                File.WriteAllText(Path.Combine(updateCodePath, "UNCOMPRESSED.txt"), "DONE");
+                File.WriteAllText(Path.Combine(currentGameInfo.updateCodePath, "UNCOMPRESSED.txt"), "DONE");
             }
         }
 
@@ -389,12 +491,12 @@ namespace CemuStub
 
 
             if (Recreate)
-                if (File.Exists(updateRpxBackup))
-                    File.Delete(updateRpxBackup);
+                if (File.Exists(currentGameInfo.updateRpxBackup))
+                    File.Delete(currentGameInfo.updateRpxBackup);
 
-            if (!File.Exists(updateRpxBackup))
+            if (!File.Exists(currentGameInfo.updateRpxBackup))
             {
-                File.Copy(updateRpxLocation, updateRpxBackup);
+                File.Copy(currentGameInfo.updateRpxLocation, currentGameInfo.updateRpxBackup);
             }
         }
 
@@ -403,9 +505,9 @@ namespace CemuStub
             rpxInterface.ApplyWorkingFile();
 
             ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = CemuExeLocation;
-            psi.WorkingDirectory = new FileInfo(CemuExeLocation).DirectoryName;
-            psi.Arguments = $"-g \"{gameRpxPath}\"";
+            psi.FileName = currentGameInfo.CemuExeLocation;
+            psi.WorkingDirectory = new FileInfo(currentGameInfo.CemuExeLocation).DirectoryName;
+            psi.Arguments = $"-g \"{currentGameInfo.gameRpxPath}\"";
             //psi.RedirectStandardOutput = true;
             //psi.RedirectStandardError = true;
             //psi.UseShellExecute = false;
@@ -440,11 +542,11 @@ namespace CemuStub
         {
             rpxInterface.CloseStream();
 
-            if (File.Exists(updateRpxBackup))
+            if (File.Exists(currentGameInfo.updateRpxBackup))
             {
-                if (File.Exists(updateRpxLocation))
-                    File.Delete(updateRpxLocation);
-                File.Copy(updateRpxBackup, updateRpxLocation);
+                if (File.Exists(currentGameInfo.updateRpxLocation))
+                    File.Delete(currentGameInfo.updateRpxLocation);
+                File.Copy(currentGameInfo.updateRpxBackup, currentGameInfo.updateRpxLocation);
             }
             else
                 MessageBox.Show("Backup could not be found");
@@ -464,6 +566,7 @@ namespace CemuStub
             catch (Exception e)
             {
                 cemuProcess = null;
+                Console.WriteLine(e);
             }
             //If the title is still expectedCemuTitle, we know something else didn't eat the pid 
             if (!(cemuProcess?.MainWindowTitle.Contains(expectedCemuTitle) ?? false))
@@ -496,6 +599,7 @@ namespace CemuStub
             S.GET<CS_Core_Form>().btnRestoreBackup.Enabled = true;
             S.GET<CS_Core_Form>().btnStartRpx.Enabled = true;
             S.GET<CS_Core_Form>().btnReconstructFakeUpdate.Enabled = true;
+            S.GET<CS_Core_Form>().btnUnmodSelectedGame.Enabled = true;
         }
 
         public static void DisableButtons()
@@ -504,6 +608,7 @@ namespace CemuStub
             S.GET<CS_Core_Form>().btnRestoreBackup.Enabled = false;
             S.GET<CS_Core_Form>().btnStartRpx.Enabled = false;
             S.GET<CS_Core_Form>().btnReconstructFakeUpdate.Enabled = false;
+            S.GET<CS_Core_Form>().btnUnmodSelectedGame.Enabled = false;
         }
 
     }
