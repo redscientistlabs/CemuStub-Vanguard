@@ -299,7 +299,7 @@ namespace CemuStub
             currentGameInfo.rpxFile = logLoadingLineParts[logLoadingLineParts.Length - 1];
 
             //Getting rpx path from settings.bin
-            byte[] rpx = { 0x2E, 0x00, 0x72, 0x00, 0x70, 0x00, 0x78 }; //".rpx" with the extra characters
+            byte[] rpx = { 0x2E, 0x00, 0x72, 0x00, 0x70, 0x00, 0x78, 0x00 }; //".rpx" encoded as utf-16
             int startOffset = 0xB7;
             var endOffset = settingsBin.IndexOf(rpx) + rpx.Length;
 
