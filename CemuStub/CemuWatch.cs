@@ -124,8 +124,6 @@ namespace CemuStub
             LoadRpxFileInterface();
 
             state = CemuState.READY;
-            watch.Stop();
-
             S.GET<CS_Core_Form>().lbCemuStatus.Text = "Ready for corrupting";
             S.GET<CS_Core_Form>().lbTargetedGameRpx.Text = currentGameInfo.gameRpxFileInfo.FullName;
             S.GET<CS_Core_Form>().lbTargetedGameId.Text = "Game ID: " + currentGameInfo.FirstID + "-" + currentGameInfo.SecondID;
@@ -167,6 +165,7 @@ namespace CemuStub
                 SaveKnownGames();
 
                 VanguardCore.Start();
+
             }
 
         }
@@ -332,6 +331,8 @@ namespace CemuStub
         {
             try
             {
+
+
                 PartialSpec gameDone = new PartialSpec("VanguardSpec");
                 gameDone[VSPEC.SYSTEM] = "Wii U";
                 gameDone[VSPEC.GAMENAME] = CemuWatch.currentGameInfo.gameName;
