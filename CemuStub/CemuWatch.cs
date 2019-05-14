@@ -55,6 +55,7 @@ namespace CemuStub
             S.GET<CS_Core_Form>().lbTargetedGameRpx.Text = "No game selected. Cemu Stub will auto-detect and prepare any game you load in Cemu.";
 
             DisableButtons();
+            state = CemuState.UNFOUND;
 
 
 
