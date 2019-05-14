@@ -91,6 +91,7 @@ namespace CemuStub
             //remove item from known games and go back to autodetect
             var lastRef = CemuWatch.currentGameInfo;
             CompositeFilenameDico.Remove(lastRef.gameName);
+            knownGamesDico.Remove(lastRef.gameName);
             SaveKnownGames();
             S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = 0;
             S.GET<CS_Core_Form>().cbSelectedGame.Items.Remove(lastRef.gameName);
