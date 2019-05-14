@@ -305,17 +305,11 @@ namespace CemuStub
 
             byte[] tmp = new byte[endOffset - startOffset];
             Array.Copy(settingsBin, startOffset, tmp, 0, endOffset - startOffset);
-            var chars = Encoding.UTF8.GetChars(tmp);
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < chars.Length; i++)
-            {
-                if (i % 2 == 0)
-                    sb.Append(chars[i]);
-            }
+            var gamePath = Encoding.Unicode.GetString(tmp);
 
 
 
-            currentGameInfo.gameRpxPath = sb.ToString();
+            currentGameInfo.gameRpxPath = gamePath;
             currentGameInfo.gameRpxFileInfo = new FileInfo(currentGameInfo.gameRpxPath);
             currentGameInfo.updateRpxPath = Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "mlc01", "usr", "title", currentGameInfo.FirstID, currentGameInfo.SecondID);
 
