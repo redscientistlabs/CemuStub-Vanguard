@@ -544,9 +544,7 @@ namespace CemuStub
 
             if (File.Exists(currentGameInfo.updateRpxBackup))
             {
-                if (File.Exists(currentGameInfo.updateRpxLocation))
-                    File.Delete(currentGameInfo.updateRpxLocation);
-                File.Copy(currentGameInfo.updateRpxBackup, currentGameInfo.updateRpxLocation);
+                File.Copy(currentGameInfo.updateRpxBackup, currentGameInfo.updateRpxLocation, true);
             }
             else
                 MessageBox.Show("Backup could not be found");
