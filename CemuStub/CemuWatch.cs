@@ -80,7 +80,7 @@ namespace CemuStub
                 Application.Exit();
 
             watch = new Timer();
-            watch.Interval = 1500;
+            watch.Interval = 1000;
             watch.Tick += Watch_Tick;
             watch.Start();
         }
@@ -365,9 +365,13 @@ namespace CemuStub
             try
             {
                 Console.WriteLine($" getInterfaces()");
+                if (rpxInterface == null)
+                {
+                    Console.WriteLine($"rpxInterface was null!");
+                    return new MemoryDomainProxy[] { };
+                }
 
                 List<MemoryDomainProxy> interfaces = new List<MemoryDomainProxy>();
-
                 interfaces.Add(new MemoryDomainProxy(rpxInterface));
 
                 return interfaces.ToArray();
@@ -557,7 +561,8 @@ namespace CemuStub
             //Get a new process object from then pid we have. 
             try
             {
-                cemuProcess = Process.GetProcessById(cemuProcess?.Id ?? -1);
+                if(cemuProcess?.Id != null)
+                    cemuProcess = Process.GetProcessById(cemuProcess.Id);
             }
             catch (Exception e)
             {
@@ -573,8 +578,8 @@ namespace CemuStub
 
         public static void RefreshCemuProcess(Process p = null)
         {
-            if(p == null)
-                p = Process.GetProcesses().FirstOrDefault(it => it?.MainWindowTitle?.Contains(expectedCemuTitle) ?? false);
+            if (p == null)
+                p = Process.GetProcessesByName("Cemu").FirstOrDefault(it => it?.MainWindowTitle?.Contains(expectedCemuTitle) ?? false);
 
             cemuProcess = p;
 
