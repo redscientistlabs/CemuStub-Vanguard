@@ -80,7 +80,7 @@ namespace Vanguard
                         SyncObjectSingleton.FormExecute((o, ea) =>
                         {
                             //e.setReturnValue(VanguardCore.SaveSavestate_NET(advancedMessage.objectValue as string));
-                            e.setReturnValue(true);
+                            e.setReturnValue("");
                         });
                         break;
 
