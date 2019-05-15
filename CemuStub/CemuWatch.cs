@@ -56,7 +56,7 @@ namespace CemuStub
 
             S.GET<CS_Core_Form>().lbCemuStatus.Text = "Waiting for Cemu";
             S.GET<CS_Core_Form>().lbTargetedGameId.Text = "";
-            S.GET<CS_Core_Form>().lbTargetedGameRpx.Text = "No game selected. Cemu Stub will auto-detect and prepare any game you load in Cemu.";
+            S.GET<CS_Core_Form>().lbTargetedGameRpx.Text = $"No game selected. Cemu Stub will auto-detect and prepare any game you load in {expectedCemuTitle}";
 
             DisableInterface();
             state = CemuState.UNFOUND;
