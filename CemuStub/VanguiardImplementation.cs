@@ -36,7 +36,6 @@ namespace Vanguard
                 spec.MessageReceived += OnMessageReceived;
 
                 connector = new RTCV.Vanguard.VanguardConnector(spec);
-
             }
             catch (Exception ex)
             {

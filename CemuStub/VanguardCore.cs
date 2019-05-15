@@ -18,6 +18,7 @@ namespace Vanguard
     {
         public static string[] args;
         public static bool vanguardStarted = false;
+        public static bool vanguardConnected => (VanguardImplementation.connector != null ? VanguardImplementation.connector.netcoreStatus == NetworkStatus.CONNECTED : false);
 
         internal static DialogResult ShowErrorDialog(Exception exception, bool canContinue = false)
         {

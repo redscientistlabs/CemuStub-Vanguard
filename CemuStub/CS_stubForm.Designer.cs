@@ -31,22 +31,17 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CS_Core_Form));
             this.label1 = new System.Windows.Forms.Label();
             this.lbCemuStatus = new System.Windows.Forms.Label();
-            this.btnStartRpx = new System.Windows.Forms.Button();
-            this.btnReconstructFakeUpdate = new System.Windows.Forms.Button();
             this.lbTargetedGameRpx = new System.Windows.Forms.Label();
             this.pnSideBar = new System.Windows.Forms.Panel();
             this.pnGlitchHarvesterOpen = new System.Windows.Forms.Panel();
             this.btnRestoreBackup = new System.Windows.Forms.Button();
             this.btnResetBackup = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.btnUnmodSelectedGame = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.lbTargetedGameId = new System.Windows.Forms.Label();
             this.cbSelectedGame = new System.Windows.Forms.ComboBox();
+            this.btnSettings = new System.Windows.Forms.Button();
             this.pnSideBar.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -71,40 +66,6 @@
             this.lbCemuStatus.TabIndex = 1;
             this.lbCemuStatus.Text = "Waiting for Cemu";
             // 
-            // btnStartRpx
-            // 
-            this.btnStartRpx.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
-            this.btnStartRpx.Enabled = false;
-            this.btnStartRpx.FlatAppearance.BorderColor = System.Drawing.Color.Gray;
-            this.btnStartRpx.FlatAppearance.BorderSize = 0;
-            this.btnStartRpx.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnStartRpx.Font = new System.Drawing.Font("Segoe UI", 8F);
-            this.btnStartRpx.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-            this.btnStartRpx.Location = new System.Drawing.Point(8, 13);
-            this.btnStartRpx.Name = "btnStartRpx";
-            this.btnStartRpx.Size = new System.Drawing.Size(147, 24);
-            this.btnStartRpx.TabIndex = 6;
-            this.btnStartRpx.Text = "Manually Start RPX";
-            this.btnStartRpx.UseVisualStyleBackColor = false;
-            this.btnStartRpx.Click += new System.EventHandler(this.BtnStartRpx_Click);
-            // 
-            // btnReconstructFakeUpdate
-            // 
-            this.btnReconstructFakeUpdate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
-            this.btnReconstructFakeUpdate.Enabled = false;
-            this.btnReconstructFakeUpdate.FlatAppearance.BorderColor = System.Drawing.Color.Gray;
-            this.btnReconstructFakeUpdate.FlatAppearance.BorderSize = 0;
-            this.btnReconstructFakeUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnReconstructFakeUpdate.Font = new System.Drawing.Font("Segoe UI", 8F);
-            this.btnReconstructFakeUpdate.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-            this.btnReconstructFakeUpdate.Location = new System.Drawing.Point(8, 42);
-            this.btnReconstructFakeUpdate.Name = "btnReconstructFakeUpdate";
-            this.btnReconstructFakeUpdate.Size = new System.Drawing.Size(147, 24);
-            this.btnReconstructFakeUpdate.TabIndex = 7;
-            this.btnReconstructFakeUpdate.Text = "Reconstruct Fake Update";
-            this.btnReconstructFakeUpdate.UseVisualStyleBackColor = false;
-            this.btnReconstructFakeUpdate.Click += new System.EventHandler(this.BtnReconstructFakeUpdate_Click);
-            // 
             // lbTargetedGameRpx
             // 
             this.lbTargetedGameRpx.Font = new System.Drawing.Font("Segoe UI", 7F);
@@ -127,7 +88,7 @@
             this.pnSideBar.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnSideBar.Location = new System.Drawing.Point(0, 0);
             this.pnSideBar.Name = "pnSideBar";
-            this.pnSideBar.Size = new System.Drawing.Size(130, 179);
+            this.pnSideBar.Size = new System.Drawing.Size(130, 191);
             this.pnSideBar.TabIndex = 10;
             this.pnSideBar.Tag = "color:dark3";
             // 
@@ -187,51 +148,12 @@
             this.btnResetBackup.UseVisualStyleBackColor = false;
             this.btnResetBackup.Click += new System.EventHandler(this.BtnResetBackup_Click);
             // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.panel1.Controls.Add(this.btnUnmodSelectedGame);
-            this.panel1.Controls.Add(this.btnStartRpx);
-            this.panel1.Controls.Add(this.btnReconstructFakeUpdate);
-            this.panel1.Location = new System.Drawing.Point(342, 38);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(163, 124);
-            this.panel1.TabIndex = 11;
-            // 
-            // btnUnmodSelectedGame
-            // 
-            this.btnUnmodSelectedGame.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
-            this.btnUnmodSelectedGame.Enabled = false;
-            this.btnUnmodSelectedGame.FlatAppearance.BorderColor = System.Drawing.Color.Gray;
-            this.btnUnmodSelectedGame.FlatAppearance.BorderSize = 0;
-            this.btnUnmodSelectedGame.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUnmodSelectedGame.Font = new System.Drawing.Font("Segoe UI", 8F);
-            this.btnUnmodSelectedGame.ForeColor = System.Drawing.Color.OrangeRed;
-            this.btnUnmodSelectedGame.Location = new System.Drawing.Point(8, 88);
-            this.btnUnmodSelectedGame.Name = "btnUnmodSelectedGame";
-            this.btnUnmodSelectedGame.Size = new System.Drawing.Size(147, 24);
-            this.btnUnmodSelectedGame.TabIndex = 8;
-            this.btnUnmodSelectedGame.Text = "Unmod selected game";
-            this.btnUnmodSelectedGame.UseVisualStyleBackColor = false;
-            this.btnUnmodSelectedGame.Click += new System.EventHandler(this.BtnUnmodSelectedGame_Click);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Segoe UI Semibold", 9F);
-            this.label4.ForeColor = System.Drawing.Color.White;
-            this.label4.Location = new System.Drawing.Point(347, 15);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(115, 15);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "Settings and params";
-            // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Segoe UI Semibold", 9F);
             this.label5.ForeColor = System.Drawing.Color.White;
-            this.label5.Location = new System.Drawing.Point(148, 15);
+            this.label5.Location = new System.Drawing.Point(148, 26);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(87, 15);
             this.label5.TabIndex = 12;
@@ -243,7 +165,7 @@
             this.panel2.Controls.Add(this.lbTargetedGameRpx);
             this.panel2.Controls.Add(this.lbTargetedGameId);
             this.panel2.Controls.Add(this.cbSelectedGame);
-            this.panel2.Location = new System.Drawing.Point(144, 38);
+            this.panel2.Location = new System.Drawing.Point(144, 49);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(185, 124);
             this.panel2.TabIndex = 13;
@@ -274,17 +196,34 @@
             this.cbSelectedGame.Tag = "color:normal";
             this.cbSelectedGame.SelectedIndexChanged += new System.EventHandler(this.CbSelectedGame_SelectedIndexChanged);
             // 
+            // btnSettings
+            // 
+            this.btnSettings.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btnSettings.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.btnSettings.FlatAppearance.BorderSize = 0;
+            this.btnSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSettings.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.btnSettings.ForeColor = System.Drawing.Color.OrangeRed;
+            this.btnSettings.Image = ((System.Drawing.Image)(resources.GetObject("btnSettings.Image")));
+            this.btnSettings.Location = new System.Drawing.Point(297, 14);
+            this.btnSettings.Name = "btnSettings";
+            this.btnSettings.Size = new System.Drawing.Size(32, 32);
+            this.btnSettings.TabIndex = 172;
+            this.btnSettings.TabStop = false;
+            this.btnSettings.Tag = "color:light1";
+            this.btnSettings.UseVisualStyleBackColor = false;
+            this.btnSettings.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnSettings_MouseDown);
+            // 
             // CS_Core_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
-            this.ClientSize = new System.Drawing.Size(518, 179);
+            this.ClientSize = new System.Drawing.Size(341, 191);
+            this.Controls.Add(this.btnSettings);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.panel1);
             this.Controls.Add(this.pnSideBar);
-            this.Controls.Add(this.label4);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -293,7 +232,6 @@
             this.Load += new System.EventHandler(this.CS_Core_Form_Load);
             this.pnSideBar.ResumeLayout(false);
             this.pnSideBar.PerformLayout();
-            this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -304,20 +242,16 @@
 
         private System.Windows.Forms.Label label1;
         public System.Windows.Forms.Label lbCemuStatus;
-        public System.Windows.Forms.Button btnStartRpx;
-        public System.Windows.Forms.Button btnReconstructFakeUpdate;
         public System.Windows.Forms.Label lbTargetedGameRpx;
         private System.Windows.Forms.Panel pnSideBar;
         internal System.Windows.Forms.Panel pnGlitchHarvesterOpen;
         public System.Windows.Forms.Button btnRestoreBackup;
         public System.Windows.Forms.Button btnResetBackup;
-        private System.Windows.Forms.Panel panel1;
-        public System.Windows.Forms.Label label4;
         public System.Windows.Forms.Label label5;
         private System.Windows.Forms.Panel panel2;
         public System.Windows.Forms.ComboBox cbSelectedGame;
         public System.Windows.Forms.Label lbTargetedGameId;
-        public System.Windows.Forms.Button btnUnmodSelectedGame;
+        public System.Windows.Forms.Button btnSettings;
     }
 }
 

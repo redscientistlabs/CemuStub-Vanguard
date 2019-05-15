@@ -125,6 +125,9 @@ namespace CemuStub
                 Filename = targetId[1];
                 ShortFilename = Filename.Substring(Filename.LastIndexOf("\\") + 1, Filename.Length - (Filename.LastIndexOf("\\") + 1));
 
+                if(!File.Exists(Filename))
+                    throw new FileNotFoundException("The file " + Filename + " doesn't exist! Cancelling load");
+
                 FileInfo info = new System.IO.FileInfo(Filename);
 
                 if (info.IsReadOnly)
@@ -723,11 +726,11 @@ namespace CemuStub
         public string updateRpxLocation = null;
         public string updateRpxCompressed = null;
         public string updateRpxBackup = null;
-        public string CemuExeLocation;
         public string FirstID = null;
         public string SecondID = null;
         public string fileInterfaceTargetId = null;
         public string gameName = "No game";
+        public string updateRpxUncompressedToken = null;
 
         public override string ToString()
         {

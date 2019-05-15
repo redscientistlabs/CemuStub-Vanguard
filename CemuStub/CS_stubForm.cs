@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,15 +40,6 @@ namespace CemuStub
             CemuWatch.SaveCompositeFilenameDico();
         }
 
-        private void BtnStartRpx_Click(object sender, EventArgs e)
-        {
-            CemuWatch.StartRpx();
-        }
-
-        private void BtnReconstructFakeUpdate_Click(object sender, EventArgs e)
-        {
-            CemuWatch.PrepareUpdateFolder(true);
-        }
 
         private void CS_Core_Form_Load(object sender, EventArgs e)
         {
@@ -63,22 +55,71 @@ namespace CemuStub
             string selected = cbSelectedGame.SelectedItem.ToString();
             if (selected == "Autodetect")
             { 
+
+
                 CemuWatch.Start();
                 return;
             }
 
-            CemuWatch.SelectGame(selected);
+            if(!CemuWatch.SelectGame(selected))
+            {
+                cbSelectedGame.SelectedIndex = 0;
+                return;
+            }
 
             if(!VanguardCore.vanguardStarted)
                 VanguardCore.Start();
-            else
+            else if (VanguardCore.vanguardConnected)
                 CemuWatch.UpdateDomains();
 
         }
 
-        private void BtnUnmodSelectedGame_Click(object sender, EventArgs e)
+        private void BtnSettings_MouseDown(object sender, MouseEventArgs e)
         {
-            CemuWatch.UnmodGame();
+
+            Point locate = new Point(((Control)sender).Location.X + e.Location.X, ((Control)sender).Location.Y + e.Location.Y);
+
+            FileInfo cemuExeFile = null;
+
+            if (CemuWatch.currentGameInfo != null && CemuWatch.currentGameInfo.gameName != "No game")
+                cemuExeFile = CemuWatch.currentGameInfo.cemuExeFile;
+            else if (CemuWatch.knownGamesDico.Values.Count > 0)
+                cemuExeFile = CemuWatch.knownGamesDico.Values.First().cemuExeFile;
+
+            ContextMenuStrip loadMenuItems = new ContextMenuStrip();
+
+            loadMenuItems.Items.Add("Start Cemu", null, new EventHandler((ob, ev) =>
+            {
+                CemuWatch.StartRpx();
+            })).Visible = (cemuExeFile != null);
+
+            var startRpxItem = loadMenuItems.Items.Add("Manually start Rpx", null, new EventHandler((ob, ev) =>
+            {
+                CemuWatch.StartRpx();
+            }));
+
+            startRpxItem.Visible = (cemuExeFile != null);
+            startRpxItem.Enabled = CemuWatch.InterfaceEnabled;
+
+
+            loadMenuItems.Items.Add("Reconstruct fake update", null, new EventHandler((ob, ev) =>
+            {
+                CemuWatch.PrepareUpdateFolder(true);
+            })).Enabled = CemuWatch.InterfaceEnabled;
+
+            loadMenuItems.Items.Add("Change Cemu location", null, new EventHandler((ob, ev) =>
+            {
+                CemuWatch.ChangeCemuLocation();
+            })).Enabled = CemuWatch.InterfaceEnabled;
+
+            loadMenuItems.Items.Add(new ToolStripSeparator());
+
+            loadMenuItems.Items.Add("Unmod selected Game", null, new EventHandler((ob, ev) =>
+            {
+                CemuWatch.UnmodGame();
+            })).Enabled = CemuWatch.InterfaceEnabled;
+
+            loadMenuItems.Show(this, locate);
         }
     }
 }
