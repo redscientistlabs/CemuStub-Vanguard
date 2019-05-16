@@ -123,7 +123,7 @@ namespace CemuStub
             {
                 string[] targetId = _targetId.Split('|');
                 Filename = targetId[1];
-                ShortFilename = Filename.Substring(Filename.LastIndexOf("\\") + 1, Filename.Length - (Filename.LastIndexOf("\\") + 1));
+                ShortFilename = new FileInfo(Filename).Name;
 
                 if(!File.Exists(Filename))
                     throw new FileNotFoundException("The file " + Filename + " doesn't exist! Cancelling load");
@@ -190,13 +190,13 @@ namespace CemuStub
         public string getCorruptFilename(bool overrideWriteCopyMode = false)
         {
             if (overrideWriteCopyMode || CemuWatch.writeCopyMode)
-                return CemuWatch.currentDir + "\\TEMP\\" + getCompositeFilename("CORRUPT");
+                return Path.Combine(CemuWatch.currentDir, "TEMP", getCompositeFilename("CORRUPT"));
             else
                 return Filename;
         }
         public string getBackupFilename()
         {
-            return CemuWatch.currentDir + "\\TEMP\\" + getCompositeFilename("BACKUP");
+            return Path.Combine(CemuWatch.currentDir, "TEMP", getCompositeFilename("BACKUP"));
         }
 
         public override void ResetWorkingFile()
@@ -718,6 +718,7 @@ namespace CemuStub
         public FileInfo gameRpxFileInfo = null;
         public FileInfo cemuExeFile = null;
         public FileInfo[] updateCodeFiles = null;
+        public DirectoryInfo gameSaveFolder = null;
         public string rpxFile = null;
         public string gameRpxPath = null;
         public string updateRpxPath = null;

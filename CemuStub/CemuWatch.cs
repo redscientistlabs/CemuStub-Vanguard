@@ -62,21 +62,26 @@ namespace CemuStub
             state = CemuState.UNFOUND;
 
 
+            string tempPath = Path.Combine(CemuWatch.currentDir, "TEMP");
+            string temp2Path = Path.Combine(CemuWatch.currentDir, "TEMP2");
+            string paramsPath = Path.Combine(CemuWatch.currentDir, "PARAMS");
 
-            if (!Directory.Exists(CemuWatch.currentDir + "\\TEMP\\"))
-                Directory.CreateDirectory(CemuWatch.currentDir + "\\TEMP\\");
+            if (!Directory.Exists(tempPath))
+                Directory.CreateDirectory(tempPath);
 
-            if (!Directory.Exists(CemuWatch.currentDir + "\\TEMP2\\"))
-                Directory.CreateDirectory(CemuWatch.currentDir + "\\TEMP2\\");
+            if (!Directory.Exists(temp2Path))
+                Directory.CreateDirectory(temp2Path);
 
-            if (!Directory.Exists(CemuWatch.currentDir + "\\PARAMS\\"))
-                Directory.CreateDirectory(CemuWatch.currentDir + "\\PARAMS\\");
+            if (!Directory.Exists(paramsPath))
+                Directory.CreateDirectory(paramsPath);
 
+            string disclaimerPath = Path.Combine(currentDir, "LICENSES", "DISCLAIMER.TXT");
+            string disclaimerReadPath = Path.Combine(currentDir, "PARAMS", "DISCLAIMERREAD");
 
-            if (File.Exists(currentDir + "\\LICENSES\\DISCLAIMER.TXT") && !File.Exists(currentDir + "\\PARAMS\\DISCLAIMERREAD"))
+            if (File.Exists(disclaimerPath) && !File.Exists(disclaimerReadPath))
             {
-                MessageBox.Show(File.ReadAllText(currentDir + "\\LICENSES\\DISCLAIMER.TXT").Replace("[ver]", CemuWatch.CemuStubVersion), "Cemu Stub", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                File.Create(currentDir + "\\PARAMS\\DISCLAIMERREAD");
+                MessageBox.Show(File.ReadAllText(disclaimerPath).Replace("[ver]", CemuWatch.CemuStubVersion), "Cemu Stub", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                File.Create(disclaimerReadPath);
             }
 
             //If we can't load the dictionary, quit the wgh to prevent the loss of backups
@@ -280,7 +285,7 @@ namespace CemuStub
         public static bool LoadKnownGames()
         {
             JsonSerializer serializer = new JsonSerializer();
-            string path = Path.Combine(CemuWatch.currentDir + "\\PARAMS\\" + "knowngames.json");
+            string path = Path.Combine(CemuWatch.currentDir, "PARAMS", "knowngames.json");
             if (!File.Exists(path))
             {
                 knownGamesDico = new Dictionary<string, CemuGameInfo>();
@@ -308,7 +313,7 @@ namespace CemuStub
         public static bool SaveKnownGames()
         {
             JsonSerializer serializer = new JsonSerializer();
-            var path = CemuWatch.currentDir + "\\PARAMS\\" + "knowngames.json";
+            var path = Path.Combine(CemuWatch.currentDir, "PARAMS", "knowngames.json");
             try
             {
                 using (StreamWriter sw = new StreamWriter(path))
@@ -467,6 +472,8 @@ namespace CemuStub
             currentGameInfo.updateCodePath = Path.Combine(currentGameInfo.updateRpxPath, "code");
             currentGameInfo.updateMetaPath = Path.Combine(currentGameInfo.updateRpxPath, "meta");
 
+            currentGameInfo.gameSaveFolder = new DirectoryInfo(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "mlc01", "usr", "save", currentGameInfo.FirstID, currentGameInfo.SecondID));
+
 
 
             currentGameInfo.updateRpxLocation = Path.Combine(currentGameInfo.updateCodePath, currentGameInfo.rpxFile);
@@ -593,7 +600,7 @@ namespace CemuStub
         public static bool LoadCompositeFilenameDico()
         {
             JsonSerializer serializer = new JsonSerializer();
-            string filemapPath = Path.Combine(CemuWatch.currentDir + "\\TEMP\\" + "filemap.json");
+            string filemapPath = Path.Combine(CemuWatch.currentDir, "TEMP", "filemap.json");
             if (!File.Exists(filemapPath))
             {
                 CompositeFilenameDico = new Dictionary<string, string>();
@@ -619,7 +626,7 @@ namespace CemuStub
         public static bool SaveCompositeFilenameDico()
         {
             JsonSerializer serializer = new JsonSerializer();
-            var path = CemuWatch.currentDir + "\\TEMP\\" + "filemap.json";
+            var path = Path.Combine(CemuWatch.currentDir, "TEMP", "filemap.json");
             try
             {
                 using (StreamWriter sw = new StreamWriter(path))

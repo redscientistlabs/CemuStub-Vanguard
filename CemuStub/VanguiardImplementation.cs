@@ -79,14 +79,14 @@ namespace Vanguard
                     case SAVESAVESTATE:
                         SyncObjectSingleton.FormExecute((o, ea) =>
                         {
-                            //e.setReturnValue(VanguardCore.SaveSavestate_NET(advancedMessage.objectValue as string));
-                            e.setReturnValue("");
+                            e.setReturnValue(VanguardCore.SaveSavestate_NET(advancedMessage.objectValue as string));
+                            //e.setReturnValue("");
                         });
                         break;
 
                     case LOADSAVESTATE:
                         {
-                            /*
+                            
                             var cmd = advancedMessage.objectValue as object[];
                             var path = cmd[0] as string;
                             var location = (StashKeySavestateLocation)cmd[1];
