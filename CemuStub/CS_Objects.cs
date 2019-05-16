@@ -730,7 +730,7 @@ namespace CemuStub
         public string FirstID = null;
         public string SecondID = null;
         public string fileInterfaceTargetId = null;
-        public string gameName = "No game";
+        public string gameName = "Autodetect";
         public string updateRpxUncompressedToken = null;
 
         public override string ToString()

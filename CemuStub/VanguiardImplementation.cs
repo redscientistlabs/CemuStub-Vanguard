@@ -94,7 +94,7 @@ namespace Vanguard
                             {
                                 e.setReturnValue(VanguardCore.LoadSavestate_NET(path, location));
                             });
-                            */
+                            
 
                             e.setReturnValue(true);
                             break;

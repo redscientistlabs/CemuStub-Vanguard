@@ -659,15 +659,29 @@ namespace CemuStub
                 File.Copy(currentGameInfo.updateRpxLocation, currentGameInfo.updateRpxBackup);
             }
         }
-
-        internal static void StartRpx()
+        internal static void StartCemu(string rpxFile = null)
         {
-            rpxInterface.ApplyWorkingFile();
+            rpxInterface?.ApplyWorkingFile();
 
             ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = currentGameInfo.cemuExeFile.FullName;
-            psi.WorkingDirectory = currentGameInfo.cemuExeFile.DirectoryName;
-            psi.Arguments = $"-g \"{currentGameInfo.gameRpxPath}\"";
+
+            FileInfo cemuFile;
+
+            if (currentGameInfo.gameName == "Autodetect")
+            {
+                if (knownGamesDico.Values.Count() > 0)
+                    cemuFile = knownGamesDico.Values.First().cemuExeFile;
+                else
+                    return;
+            }
+            else
+                cemuFile = currentGameInfo.cemuExeFile;
+
+            psi.FileName = cemuFile.FullName;
+            psi.WorkingDirectory = cemuFile.DirectoryName;
+
+            if (rpxFile != null)
+                psi.Arguments = $"-g \"{rpxFile}\"";
             //psi.RedirectStandardOutput = true;
             //psi.RedirectStandardError = true;
             //psi.UseShellExecute = false;
@@ -675,6 +689,8 @@ namespace CemuStub
 
             Process.Start(psi);
         }
+
+        internal static void StartRpx() => StartCemu(currentGameInfo.gameRpxPath);
 
         private static void ScanCemu()
         {

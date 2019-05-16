@@ -81,7 +81,7 @@ namespace CemuStub
 
             FileInfo cemuExeFile = null;
 
-            if (CemuWatch.currentGameInfo != null && CemuWatch.currentGameInfo.gameName != "No game")
+            if (CemuWatch.currentGameInfo != null && CemuWatch.currentGameInfo.gameName != "Autodetect")
                 cemuExeFile = CemuWatch.currentGameInfo.cemuExeFile;
             else if (CemuWatch.knownGamesDico.Values.Count > 0)
                 cemuExeFile = CemuWatch.knownGamesDico.Values.First().cemuExeFile;
@@ -90,7 +90,7 @@ namespace CemuStub
 
             loadMenuItems.Items.Add("Start Cemu", null, new EventHandler((ob, ev) =>
             {
-                CemuWatch.StartRpx();
+                CemuWatch.StartCemu();
             })).Visible = (cemuExeFile != null);
 
             var startRpxItem = loadMenuItems.Items.Add("Manually start Rpx", null, new EventHandler((ob, ev) =>
