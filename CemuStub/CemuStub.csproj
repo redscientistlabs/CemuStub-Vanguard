@@ -68,7 +68,6 @@
     <Compile Include="CS_stubForm.Designer.cs">
       <DependentUpon>CS_stubForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MemoryBanks.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VanguardCore.cs" />
