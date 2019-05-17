@@ -133,6 +133,7 @@ namespace Vanguard
             partial[VSPEC.SUPPORTS_CONFIG_HANDOFF] = false;
             partial[VSPEC.SUPPORTS_SAVESTATES] = true;
             partial[VSPEC.RENAME_SAVESTATE] = "Game Save";
+            partial[VSPEC.OVERRIDE_DEFAULTMAXINTENSITY] = 655350;
             partial[VSPEC.SUPPORTS_GAMEPROTECTION] = false;
             partial[VSPEC.SUPPORTS_REALTIME] = false;
             partial[VSPEC.SUPPORTS_KILLSWITCH] = false;
