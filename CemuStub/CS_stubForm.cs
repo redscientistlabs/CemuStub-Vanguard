@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RTCV.CorruptCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -36,8 +37,8 @@ namespace CemuStub
             if(MessageBox.Show("Resetting the backup will take the current rpx and promote it to backup. Do you want to continue?", "Reset Backup", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 CemuWatch.ResetBackup();
 
-            CemuWatch.CompositeFilenameDico = new Dictionary<string, string>();
-            CemuWatch.SaveCompositeFilenameDico();
+            FileInterface.CompositeFilenameDico = new Dictionary<string, string>();
+            FileInterface.SaveCompositeFilenameDico();
         }
 
 

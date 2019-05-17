@@ -37,8 +37,6 @@ namespace CemuStub
 
         public static bool InterfaceEnabled = false;
 
-        //File management
-        public static Dictionary<String, String> CompositeFilenameDico = null;
 
 
         public static void Start()
@@ -160,7 +158,7 @@ namespace CemuStub
             else if(Directory.Exists(lastRef.updateRpxPath))
                 Directory.Delete(lastRef.updateRpxPath, true);
 
-            CompositeFilenameDico.Remove(lastRef.gameName);
+            FileInterface.CompositeFilenameDico.Remove(lastRef.gameName);
             knownGamesDico.Remove(lastRef.gameName);
             SaveKnownGames();
             S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = 0;
@@ -603,7 +601,7 @@ namespace CemuStub
             string filemapPath = Path.Combine(CemuWatch.currentDir, "TEMP", "filemap.json");
             if (!File.Exists(filemapPath))
             {
-                CompositeFilenameDico = new Dictionary<string, string>();
+                FileInterface.CompositeFilenameDico = new Dictionary<string, string>();
                 return true;
             }
             try
@@ -612,32 +610,12 @@ namespace CemuStub
                 using (StreamReader sw = new StreamReader(filemapPath))
                 using (JsonTextReader reader = new JsonTextReader(sw))
                 {
-                    CompositeFilenameDico = serializer.Deserialize<Dictionary<string, string>>(reader);
+                    FileInterface.CompositeFilenameDico = serializer.Deserialize<Dictionary<string, string>>(reader);
                 }
             }
             catch (IOException e)
             {
                 MessageBox.Show("Unable to access the filemap! Figure out what's locking it and then restart the WGH.\n" + e.ToString());
-                return false;
-            }
-            return true;
-        }
-
-        public static bool SaveCompositeFilenameDico()
-        {
-            JsonSerializer serializer = new JsonSerializer();
-            var path = Path.Combine(CemuWatch.currentDir, "TEMP", "filemap.json");
-            try
-            {
-                using (StreamWriter sw = new StreamWriter(path))
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    serializer.Serialize(writer, CompositeFilenameDico);
-                }
-            }
-            catch (IOException e)
-            {
-                MessageBox.Show("Unable to access the filemap!\n" + e.ToString());
                 return false;
             }
             return true;
