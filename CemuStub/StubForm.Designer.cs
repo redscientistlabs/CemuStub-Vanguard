@@ -1,6 +1,6 @@
 ﻿namespace CemuStub
 {
-    partial class CS_Core_Form
+    partial class StubForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CS_Core_Form));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StubForm));
             this.label1 = new System.Windows.Forms.Label();
             this.lbCemuStatus = new System.Windows.Forms.Label();
             this.lbTargetedGameRpx = new System.Windows.Forms.Label();
@@ -229,7 +229,7 @@
             this.MaximizeBox = false;
             this.Name = "CS_Core_Form";
             this.Text = "Cemu Stub ";
-            this.Load += new System.EventHandler(this.CS_Core_Form_Load);
+            this.Load += new System.EventHandler(this.StubForm_Load);
             this.pnSideBar.ResumeLayout(false);
             this.pnSideBar.PerformLayout();
             this.panel2.ResumeLayout(false);

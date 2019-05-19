@@ -13,10 +13,10 @@ using Vanguard;
 
 namespace CemuStub
 {
-    public partial class CS_Core_Form : Form
+    public partial class StubForm : Form
     {
 
-        public CS_Core_Form()
+        public StubForm()
         {
             InitializeComponent();
             Text += CemuWatch.CemuStubVersion;
@@ -42,7 +42,7 @@ namespace CemuStub
         }
 
 
-        private void CS_Core_Form_Load(object sender, EventArgs e)
+        private void StubForm_Load(object sender, EventArgs e)
         {
             cbSelectedGame.SelectedIndex = 0;
             CemuWatch.LoadKnownGames();

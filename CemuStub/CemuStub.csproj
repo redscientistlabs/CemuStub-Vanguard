@@ -62,21 +62,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CemuWatch.cs" />
-    <Compile Include="CS_stubForm.cs">
+    <Compile Include="StubForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CS_stubForm.Designer.cs">
-      <DependentUpon>CS_stubForm.cs</DependentUpon>
+    <Compile Include="StubForm.Designer.cs">
+      <DependentUpon>StubForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VanguardCore.cs" />
     <Compile Include="VanguiardImplementation.cs" />
-    <Compile Include="CS_Objects.cs">
+    <Compile Include="Objects.cs">
       <SubType>Component</SubType>
     </Compile>
-    <EmbeddedResource Include="CS_stubForm.resx">
-      <DependentUpon>CS_stubForm.cs</DependentUpon>
+    <EmbeddedResource Include="StubForm.resx">
+      <DependentUpon>StubForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

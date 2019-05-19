@@ -17,8 +17,8 @@ namespace CemuStub
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var frm = new CS_Core_Form();
-            S.SET<CS_Core_Form>(frm);
+            var frm = new StubForm();
+            S.SET<StubForm>(frm);
             Application.Run(frm);
 
         }

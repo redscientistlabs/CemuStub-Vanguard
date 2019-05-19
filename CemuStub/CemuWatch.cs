@@ -52,9 +52,9 @@ namespace CemuStub
 
             CemuWatch.currentGameInfo = new CemuGameInfo();
 
-            S.GET<CS_Core_Form>().lbCemuStatus.Text = "Waiting for Cemu";
-            S.GET<CS_Core_Form>().lbTargetedGameId.Text = "";
-            S.GET<CS_Core_Form>().lbTargetedGameRpx.Text = $"No game selected. Cemu Stub will auto-detect and prepare any game you load in {expectedCemuTitle}";
+            S.GET<StubForm>().lbCemuStatus.Text = "Waiting for Cemu";
+            S.GET<StubForm>().lbTargetedGameId.Text = "";
+            S.GET<StubForm>().lbTargetedGameRpx.Text = $"No game selected. Cemu Stub will auto-detect and prepare any game you load in {expectedCemuTitle}";
 
             DisableInterface();
             state = CemuState.UNFOUND;
@@ -161,8 +161,8 @@ namespace CemuStub
             FileInterface.CompositeFilenameDico.Remove(lastRef.gameName);
             knownGamesDico.Remove(lastRef.gameName);
             SaveKnownGames();
-            S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = 0;
-            S.GET<CS_Core_Form>().cbSelectedGame.Items.Remove(lastRef.gameName);
+            S.GET<StubForm>().cbSelectedGame.SelectedIndex = 0;
+            S.GET<StubForm>().cbSelectedGame.Items.Remove(lastRef.gameName);
         }
 
         internal static bool SelectGame(string selected = null)
@@ -194,7 +194,7 @@ namespace CemuStub
                     }
                     else
                     {
-                        S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = 0;
+                        S.GET<StubForm>().cbSelectedGame.SelectedIndex = 0;
                         return false;
                     }
 
@@ -206,7 +206,7 @@ namespace CemuStub
                 }
                 else
                 {
-                    S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = 0;
+                    S.GET<StubForm>().cbSelectedGame.SelectedIndex = 0;
                     return false;
                 }
             }
@@ -220,7 +220,7 @@ namespace CemuStub
                 if(result == DialogResult.Yes)
                     UnmodGame();
 
-                S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = 0;
+                S.GET<StubForm>().cbSelectedGame.SelectedIndex = 0;
                 return false;
             }
 
@@ -228,9 +228,9 @@ namespace CemuStub
                 return false;
 
             state = CemuState.READY;
-            S.GET<CS_Core_Form>().lbCemuStatus.Text = "Ready for corrupting";
-            S.GET<CS_Core_Form>().lbTargetedGameRpx.Text = currentGameInfo.gameRpxFileInfo.FullName;
-            S.GET<CS_Core_Form>().lbTargetedGameId.Text = "Game ID: " + currentGameInfo.FirstID + "-" + currentGameInfo.SecondID;
+            S.GET<StubForm>().lbCemuStatus.Text = "Ready for corrupting";
+            S.GET<StubForm>().lbTargetedGameRpx.Text = currentGameInfo.gameRpxFileInfo.FullName;
+            S.GET<StubForm>().lbTargetedGameId.Text = "Game ID: " + currentGameInfo.FirstID + "-" + currentGameInfo.SecondID;
             EnableInterface();
 
             return true;
@@ -265,8 +265,8 @@ namespace CemuStub
                     return;
 
                 DontSelectGame = true;
-                S.GET<CS_Core_Form>().cbSelectedGame.Items.Add(currentGameInfo.gameName);
-                S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = S.GET<CS_Core_Form>().cbSelectedGame.Items.Count - 1;
+                S.GET<StubForm>().cbSelectedGame.Items.Add(currentGameInfo.gameName);
+                S.GET<StubForm>().cbSelectedGame.SelectedIndex = S.GET<StubForm>().cbSelectedGame.Items.Count - 1;
                 DontSelectGame = false;
 
                 foreach (CemuGameInfo cgi in knownGamesDico.Values)
@@ -299,7 +299,7 @@ namespace CemuStub
                 }
 
                 foreach (var key in knownGamesDico.Keys)
-                    S.GET<CS_Core_Form>().cbSelectedGame.Items.Add(key);
+                    S.GET<StubForm>().cbSelectedGame.Items.Add(key);
             }
             catch (IOException e)
             {
@@ -343,7 +343,7 @@ namespace CemuStub
 
                 if (ex is FileNotFoundException && knownGamesDico.ContainsKey(currentGameInfo.gameName))
                 {
-                    var cbSelectedGame = S.GET<CS_Core_Form>().cbSelectedGame;
+                    var cbSelectedGame = S.GET<StubForm>().cbSelectedGame;
                     object selectedItem = cbSelectedGame.SelectedItem;
                     cbSelectedGame.SelectedIndex = 0;
 
@@ -357,7 +357,7 @@ namespace CemuStub
                 }
                 else
                 {
-                    S.GET<CS_Core_Form>().cbSelectedGame.SelectedIndex = 0;
+                    S.GET<StubForm>().cbSelectedGame.SelectedIndex = 0;
                 }
                 return false;
 
@@ -676,7 +676,7 @@ namespace CemuStub
 
             if (state == CemuState.UNFOUND && p != null)
             {
-                S.GET<CS_Core_Form>().lbCemuStatus.Text = "Cemu detected, waiting for a loaded game";
+                S.GET<StubForm>().lbCemuStatus.Text = "Cemu detected, waiting for a loaded game";
                 state = CemuState.RUNNING;
             }
             else if (
@@ -685,7 +685,7 @@ namespace CemuStub
                 state != CemuState.READY && 
                 p == null)
             {
-                S.GET<CS_Core_Form>().lbCemuStatus.Text = "Waiting for Cemu";
+                S.GET<StubForm>().lbCemuStatus.Text = "Waiting for Cemu";
                 state = CemuState.UNFOUND;
                 DisableInterface();
             }
@@ -748,15 +748,15 @@ namespace CemuStub
 
         public static void EnableInterface()
         {
-            S.GET<CS_Core_Form>().btnResetBackup.Enabled = true;
-            S.GET<CS_Core_Form>().btnRestoreBackup.Enabled = true;
+            S.GET<StubForm>().btnResetBackup.Enabled = true;
+            S.GET<StubForm>().btnRestoreBackup.Enabled = true;
             InterfaceEnabled = true;
         }
 
         public static void DisableInterface()
         {
-            S.GET<CS_Core_Form>().btnResetBackup.Enabled = false;
-            S.GET<CS_Core_Form>().btnRestoreBackup.Enabled = false;
+            S.GET<StubForm>().btnResetBackup.Enabled = false;
+            S.GET<StubForm>().btnRestoreBackup.Enabled = false;
             InterfaceEnabled = false;
         }
 
