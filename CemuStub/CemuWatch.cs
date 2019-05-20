@@ -19,7 +19,7 @@ namespace CemuStub
     public static class CemuWatch
     {
         static Timer watch = null;
-        public static string CemuStubVersion = "0.04";
+        public static string CemuStubVersion = "0.05";
         public static string expectedCemuTitle = "Cemu 1.15.6c";
         public static string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
