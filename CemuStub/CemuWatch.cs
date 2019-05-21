@@ -333,7 +333,7 @@ namespace CemuStub
             try
             {
                 currentGameInfo.fileInterfaceTargetId = "File|" + currentGameInfo.updateRpxLocation;
-                rpxInterface = new FileInterface(currentGameInfo.fileInterfaceTargetId);
+                rpxInterface = new FileInterface(currentGameInfo.fileInterfaceTargetId, true);
 
                 return true;
             }
