@@ -334,7 +334,7 @@ namespace CemuStub
             {
                 currentGameInfo.fileInterfaceTargetId = "File|" + currentGameInfo.updateRpxLocation;
                 rpxInterface = new FileInterface(currentGameInfo.fileInterfaceTargetId, true);
-
+                rpxInterface.getMemoryDump();
                 return true;
             }
             catch (Exception ex)
