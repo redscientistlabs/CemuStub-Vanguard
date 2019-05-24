@@ -19,8 +19,8 @@ namespace CemuStub
     public static class CemuWatch
     {
         static Timer watch = null;
-        public static string CemuStubVersion = "0.05";
-        public static string expectedCemuTitle = "Cemu 1.15.6c";
+        public static string CemuStubVersion = "0.06";
+        public static string expectedCemuTitle = "Cemu 1.15.7c";
         public static string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         public static Dictionary<string, CemuGameInfo> knownGamesDico = new Dictionary<string, CemuGameInfo>();
@@ -249,7 +249,13 @@ namespace CemuStub
 
                 //Game is loaded in cemu, let's gather all the info we need
 
-                FetchBaseInfoFromCemuProcess();
+
+                if (!FetchBaseInfoFromCemuProcess())
+                {
+                    return; //Couldn't fetch the correct info, or they were in online mode
+                }
+
+
                 KillCemuProcess();
 
                 if (!LoadDataFromCemuFiles())
@@ -364,13 +370,21 @@ namespace CemuStub
             }
         }
 
-        private static void FetchBaseInfoFromCemuProcess()
+        private static bool FetchBaseInfoFromCemuProcess()
         {
             ///
             ///Fetching Game info from cemu process window title
             ///
 
             string windowTitle = cemuProcess.MainWindowTitle;
+
+            if (windowTitle.Contains("[Online]"))
+            {
+                MessageBox.Show("Cemu is in online mode. Cancelling load to prevent any potential bans.\nDisable online mode to use the Cemustub");
+                return false;
+            }
+                
+
             string TitleIdPart = windowTitle.Split('[').FirstOrDefault(it => it.Contains("TitleId:"));
             string TitleNumberPartLong = TitleIdPart.Split(':')[1];
             string TitleNumberPart = TitleNumberPartLong.Split(']')[0];
@@ -381,7 +395,7 @@ namespace CemuStub
             currentGameInfo.cemuExeFile = new FileInfo(cemuProcess.MainModule.FileName);
 
             currentGameInfo.gameName = TitleGameNamePart.Trim();
-
+            return true;
         }
 
         internal static void KillCemuProcess()
