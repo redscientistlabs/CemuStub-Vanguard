@@ -22,11 +22,6 @@ namespace CemuStub
             Text += CemuWatch.CemuStubVersion;
         }
 
-        private void BtnRestartStub_Click(object sender, EventArgs e)
-        {
-            Application.Restart();
-        }
-
         private void BtnRestoreBackup_Click(object sender, EventArgs e)
         {
             CemuWatch.RestoreBackup();
@@ -40,7 +35,6 @@ namespace CemuStub
             FileInterface.CompositeFilenameDico = new Dictionary<string, string>();
             FileInterface.SaveCompositeFilenameDico();
         }
-
 
         private void StubForm_Load(object sender, EventArgs e)
         {

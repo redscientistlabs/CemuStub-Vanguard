@@ -146,7 +146,7 @@ namespace Vanguard
 
 
 
-        public static void RegisterCemuSpec()
+        public static void RegisterVanguardSpec()
         {
             PartialSpec emuSpecTemplate = new PartialSpec("VanguardSpec");
 
@@ -184,7 +184,7 @@ namespace Vanguard
 
             //Start everything
             VanguardImplementation.StartClient();
-            VanguardCore.RegisterCemuSpec();
+            VanguardCore.RegisterVanguardSpec();
             CorruptCore.StartEmuSide();
 
             //Refocus on Bizhawk
@@ -204,6 +204,9 @@ namespace Vanguard
         /// <returns></returns>
         public static string SaveSavestate_NET(string Key, bool threadSave = false)
         {
+            //THIS HANDLES GAME SAVES AS SAVESTATES
+
+
             if(!CemuWatch.currentGameInfo.gameSaveFolder.Exists)
             {
                 MessageBox.Show("No Game Save could be found for this game. Cancelling operation.");
@@ -224,7 +227,6 @@ namespace Vanguard
             if (file.Directory != null && file.Directory.Exists == false)
                 file.Directory.Create();
 
-            //zip here -----------------------------
             CompressionLevel comp = CompressionLevel.NoCompression;
             ZipFile.CreateFromDirectory(CemuWatch.currentGameInfo.gameSaveFolder.FullName, targetZipfilePath, comp, false);
 
@@ -239,6 +241,8 @@ namespace Vanguard
         /// <returns></returns>
         public static bool LoadSavestate_NET(string path, StashKeySavestateLocation stateLocation = StashKeySavestateLocation.DEFAULTVALUE)
         {
+            //THIS HANDLES GAME SAVES AS SAVESTATES
+
             try
             {
 

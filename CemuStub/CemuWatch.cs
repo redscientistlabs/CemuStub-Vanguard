@@ -38,7 +38,6 @@ namespace CemuStub
         public static bool InterfaceEnabled = false;
 
 
-
         public static void Start()
         {
             if (watch != null)
@@ -420,22 +419,6 @@ namespace CemuStub
             p.WaitForExit();
         }
 
-        public static int IndexOf<T>(this T[] haystack, T[] needle)
-        {
-            if ((needle != null) && (haystack.Length >= needle.Length))
-            {
-                for (int l = 0; l < haystack.Length - needle.Length + 1; l++)
-                {
-                    if (!needle.Where((data, index) => !haystack[l + index].Equals(data)).Any())
-                    {
-                        return l;
-                    }
-                }
-            }
-
-            return -1;
-        }
-
         private static bool LoadDataFromCemuFiles()
         {
             ///
@@ -528,7 +511,6 @@ namespace CemuStub
             }
         }
 
-
         public static MemoryDomainProxy[] GetInterfaces()
         {
             try
@@ -554,7 +536,6 @@ namespace CemuStub
             }
 
         }
-
 
         internal static void PrepareUpdateFolder(bool overwrite = false)
         {
@@ -635,8 +616,8 @@ namespace CemuStub
             return true;
         }
 
-
         internal static void ResetBackup() => CreateRpxBackup(true);
+
         private static void CreateRpxBackup(bool Recreate = false)
         {
 
@@ -651,6 +632,7 @@ namespace CemuStub
                 File.Copy(currentGameInfo.updateRpxLocation, currentGameInfo.updateRpxBackup);
             }
         }
+
         internal static void StartCemu(string rpxFile = null)
         {
             rpxInterface?.ApplyWorkingFile();
@@ -759,7 +741,6 @@ namespace CemuStub
             }
         }
 
-
         public static void EnableInterface()
         {
             S.GET<StubForm>().btnResetBackup.Enabled = true;
@@ -776,12 +757,4 @@ namespace CemuStub
 
     }
 
-    enum CemuState
-    {
-        UNFOUND,
-        RUNNING,
-        GAMELOADED,
-        PREPARING,
-        READY
-    }
 }
