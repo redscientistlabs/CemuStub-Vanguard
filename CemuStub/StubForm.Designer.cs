@@ -169,6 +169,7 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(185, 124);
             this.panel2.TabIndex = 13;
+            this.panel2.Tag = "color:dark1";
             // 
             // lbTargetedGameId
             // 
@@ -210,11 +211,11 @@
             this.btnSettings.Size = new System.Drawing.Size(32, 32);
             this.btnSettings.TabIndex = 172;
             this.btnSettings.TabStop = false;
-            this.btnSettings.Tag = "color:light1";
+            this.btnSettings.Tag = "color:dark1";
             this.btnSettings.UseVisualStyleBackColor = false;
             this.btnSettings.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnSettings_MouseDown);
             // 
-            // CS_Core_Form
+            // StubForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -227,7 +228,8 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "CS_Core_Form";
+            this.Name = "StubForm";
+            this.Tag = "color:dark2";
             this.Text = "Cemu Stub ";
             this.Load += new System.EventHandler(this.StubForm_Load);
             this.pnSideBar.ResumeLayout(false);

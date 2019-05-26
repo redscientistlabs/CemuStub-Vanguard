@@ -1,4 +1,5 @@
 ﻿using RTCV.CorruptCore;
+using RTCV.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,6 +41,8 @@ namespace CemuStub
         {
             cbSelectedGame.SelectedIndex = 0;
             CemuWatch.LoadKnownGames();
+
+            UICore.SetRTCColor(Color.LightSteelBlue, this);
         }
 
         private void CbSelectedGame_SelectedIndexChanged(object sender, EventArgs e)
