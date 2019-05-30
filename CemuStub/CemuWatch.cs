@@ -19,7 +19,7 @@ namespace CemuStub
     public static class CemuWatch
     {
         static Timer watch = null;
-        public static string CemuStubVersion = "0.06";
+        public static string CemuStubVersion = "0.0.8";
         public static string expectedCemuTitle = "Cemu 1.15.7c";
         public static string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -429,8 +429,6 @@ namespace CemuStub
             //string[] settingsXml = File.ReadAllLines(Path.Combine(cemuExeFile.DirectoryName, "settings.xml"));
             byte[] settingsBin = File.ReadAllBytes(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "settings.bin"));
 
-
-
             //getting rpx filename from log.txt
             string logLoadingLine = logTxt.FirstOrDefault(it => it.Contains("Loading") && it.Contains(".rpx"));
 
@@ -458,6 +456,23 @@ namespace CemuStub
             Array.Copy(settingsBin, startOffset, tmp, 0, endOffset - startOffset);
             var gamePath = Encoding.Unicode.GetString(tmp);
 
+            try
+            {
+                if (File.Exists(gamePath))
+                {
+                    Console.WriteLine("Found game " + gamePath);
+                }
+                else
+                {
+                    throw new Exception("Couldn't find RPX");
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Something went wrong when locating the RPX of the running game.\nYou can probably fix this by going to your Cemu folder and deleting settings.bin, then trying again.\nIf this doesn't fix it, poke the devs.\n\nCouldn't find: " + gamePath );
+                CemuWatch.state = CemuState.UNFOUND;
+                return false;
+            }
 
 
             currentGameInfo.gameRpxPath = gamePath;
@@ -483,8 +498,6 @@ namespace CemuStub
         {
             try
             {
-
-
                 PartialSpec gameDone = new PartialSpec("VanguardSpec");
                 gameDone[VSPEC.SYSTEM] = "Wii U";
                 gameDone[VSPEC.GAMENAME] = CemuWatch.currentGameInfo.gameName;
@@ -545,14 +558,14 @@ namespace CemuStub
 
 
             //Creating fake update if update doesn't already exist
-            if (!Directory.Exists(currentGameInfo.updateRpxPath))
+            if (!Directory.Exists(currentGameInfo.updateRpxPath) || !File.Exists(currentGameInfo.updateRpxLocation))
             {
                 Directory.CreateDirectory(currentGameInfo.updateRpxPath);
                 Directory.CreateDirectory(currentGameInfo.updateCodePath);
                 Directory.CreateDirectory(currentGameInfo.updateMetaPath);
 
                 foreach (var file in currentGameInfo.gameRpxFileInfo.Directory.GetFiles())
-                    File.Copy(file.FullName, Path.Combine(currentGameInfo.updateCodePath, file.Name));
+                    File.Copy(file.FullName, Path.Combine(currentGameInfo.updateCodePath, file.Name), true);
 
                 DirectoryInfo gameDirectoryInfo = currentGameInfo.gameRpxFileInfo.Directory.Parent;
                 DirectoryInfo metaDirectoryInfo = new DirectoryInfo(currentGameInfo.updateMetaPath);
