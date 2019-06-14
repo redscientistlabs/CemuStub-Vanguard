@@ -41,6 +41,8 @@
             this.lbTargetedGameId = new System.Windows.Forms.Label();
             this.cbSelectedGame = new System.Windows.Forms.ComboBox();
             this.btnSettings = new System.Windows.Forms.Button();
+            this.tbExpectedVersion = new System.Windows.Forms.TextBox();
+            this.lbTargetVersion = new System.Windows.Forms.Label();
             this.pnSideBar.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -50,7 +52,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI Semibold", 10F);
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(9, 13);
+            this.label1.Location = new System.Drawing.Point(9, 10);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(48, 19);
             this.label1.TabIndex = 0;
@@ -60,9 +62,9 @@
             // 
             this.lbCemuStatus.Font = new System.Drawing.Font("Segoe UI", 8F);
             this.lbCemuStatus.ForeColor = System.Drawing.Color.White;
-            this.lbCemuStatus.Location = new System.Drawing.Point(10, 38);
+            this.lbCemuStatus.Location = new System.Drawing.Point(10, 35);
             this.lbCemuStatus.Name = "lbCemuStatus";
-            this.lbCemuStatus.Size = new System.Drawing.Size(110, 44);
+            this.lbCemuStatus.Size = new System.Drawing.Size(110, 35);
             this.lbCemuStatus.TabIndex = 1;
             this.lbCemuStatus.Text = "Waiting for Cemu";
             // 
@@ -72,7 +74,7 @@
             this.lbTargetedGameRpx.ForeColor = System.Drawing.Color.White;
             this.lbTargetedGameRpx.Location = new System.Drawing.Point(10, 56);
             this.lbTargetedGameRpx.Name = "lbTargetedGameRpx";
-            this.lbTargetedGameRpx.Size = new System.Drawing.Size(164, 64);
+            this.lbTargetedGameRpx.Size = new System.Drawing.Size(164, 80);
             this.lbTargetedGameRpx.TabIndex = 9;
             this.lbTargetedGameRpx.Text = "No game selected. Cemu Stub will auto-detect and prepare any game you load in Cem" +
     "u.";
@@ -80,6 +82,8 @@
             // pnSideBar
             // 
             this.pnSideBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(20)))), ((int)(((byte)(20)))));
+            this.pnSideBar.Controls.Add(this.lbTargetVersion);
+            this.pnSideBar.Controls.Add(this.tbExpectedVersion);
             this.pnSideBar.Controls.Add(this.pnGlitchHarvesterOpen);
             this.pnSideBar.Controls.Add(this.lbCemuStatus);
             this.pnSideBar.Controls.Add(this.label1);
@@ -88,7 +92,7 @@
             this.pnSideBar.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnSideBar.Location = new System.Drawing.Point(0, 0);
             this.pnSideBar.Name = "pnSideBar";
-            this.pnSideBar.Size = new System.Drawing.Size(130, 191);
+            this.pnSideBar.Size = new System.Drawing.Size(130, 197);
             this.pnSideBar.TabIndex = 10;
             this.pnSideBar.Tag = "color:dark3";
             // 
@@ -112,7 +116,7 @@
             this.btnRestoreBackup.Font = new System.Drawing.Font("Segoe UI", 9.75F);
             this.btnRestoreBackup.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.btnRestoreBackup.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnRestoreBackup.Location = new System.Drawing.Point(0, 89);
+            this.btnRestoreBackup.Location = new System.Drawing.Point(0, 72);
             this.btnRestoreBackup.Name = "btnRestoreBackup";
             this.btnRestoreBackup.Padding = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.btnRestoreBackup.Size = new System.Drawing.Size(133, 34);
@@ -135,7 +139,7 @@
             this.btnResetBackup.Font = new System.Drawing.Font("Segoe UI", 9.75F);
             this.btnResetBackup.ForeColor = System.Drawing.Color.OrangeRed;
             this.btnResetBackup.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnResetBackup.Location = new System.Drawing.Point(0, 127);
+            this.btnResetBackup.Location = new System.Drawing.Point(0, 110);
             this.btnResetBackup.Name = "btnResetBackup";
             this.btnResetBackup.Padding = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.btnResetBackup.Size = new System.Drawing.Size(133, 34);
@@ -167,7 +171,7 @@
             this.panel2.Controls.Add(this.cbSelectedGame);
             this.panel2.Location = new System.Drawing.Point(144, 49);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(185, 124);
+            this.panel2.Size = new System.Drawing.Size(185, 136);
             this.panel2.TabIndex = 13;
             this.panel2.Tag = "color:dark1";
             // 
@@ -215,12 +219,37 @@
             this.btnSettings.UseVisualStyleBackColor = false;
             this.btnSettings.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnSettings_MouseDown);
             // 
+            // tbExpectedVersion
+            // 
+            this.tbExpectedVersion.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(96)))), ((int)(((byte)(96)))));
+            this.tbExpectedVersion.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tbExpectedVersion.ForeColor = System.Drawing.Color.White;
+            this.tbExpectedVersion.Location = new System.Drawing.Point(11, 165);
+            this.tbExpectedVersion.Name = "tbExpectedVersion";
+            this.tbExpectedVersion.Size = new System.Drawing.Size(104, 22);
+            this.tbExpectedVersion.TabIndex = 121;
+            this.tbExpectedVersion.Tag = "96, 96, 96";
+            this.tbExpectedVersion.Text = "VERSION";
+            this.tbExpectedVersion.Visible = false;
+            // 
+            // lbTargetVersion
+            // 
+            this.lbTargetVersion.AutoSize = true;
+            this.lbTargetVersion.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.lbTargetVersion.ForeColor = System.Drawing.Color.White;
+            this.lbTargetVersion.Location = new System.Drawing.Point(8, 149);
+            this.lbTargetVersion.Name = "lbTargetVersion";
+            this.lbTargetVersion.Size = new System.Drawing.Size(112, 13);
+            this.lbTargetVersion.TabIndex = 122;
+            this.lbTargetVersion.Text = "Target Cemu Version";
+            this.lbTargetVersion.Visible = false;
+            // 
             // StubForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
-            this.ClientSize = new System.Drawing.Size(341, 191);
+            this.ClientSize = new System.Drawing.Size(341, 197);
             this.Controls.Add(this.btnSettings);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.label5);
@@ -254,6 +283,8 @@
         public System.Windows.Forms.ComboBox cbSelectedGame;
         public System.Windows.Forms.Label lbTargetedGameId;
         public System.Windows.Forms.Button btnSettings;
+        private System.Windows.Forms.TextBox tbExpectedVersion;
+        private System.Windows.Forms.Label lbTargetVersion;
     }
 }
 

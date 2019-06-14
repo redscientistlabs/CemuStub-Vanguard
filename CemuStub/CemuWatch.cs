@@ -19,8 +19,10 @@ namespace CemuStub
     public static class CemuWatch
     {
         static Timer watch = null;
-        public static string CemuStubVersion = "0.0.8";
-        public static string expectedCemuTitle = "Cemu 1.15.7c";
+        public static string CemuStubVersion = "0.0.9";
+        public static string expectedCemuVersion { get; set; } = "1.15.8";
+        public static string expectedCemuTitle => "Cemu " + expectedCemuVersion;
+
         public static string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         public static Dictionary<string, CemuGameInfo> knownGamesDico = new Dictionary<string, CemuGameInfo>();

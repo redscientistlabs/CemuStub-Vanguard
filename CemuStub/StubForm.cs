@@ -21,6 +21,13 @@ namespace CemuStub
         {
             InitializeComponent();
             Text += CemuWatch.CemuStubVersion;
+            tbExpectedVersion.Text = CemuWatch.expectedCemuVersion;
+            tbExpectedVersion.TextChanged += TbExpectedVersion_TextChanged;
+        }
+
+        private void TbExpectedVersion_TextChanged(object sender, EventArgs e)
+        {
+            CemuWatch.expectedCemuVersion = tbExpectedVersion.Text;
         }
 
         private void BtnRestoreBackup_Click(object sender, EventArgs e)
@@ -43,6 +50,7 @@ namespace CemuStub
             CemuWatch.LoadKnownGames();
 
             UICore.SetRTCColor(Color.LightSteelBlue, this);
+            lbTargetVersion.Focus();
         }
 
         private void CbSelectedGame_SelectedIndexChanged(object sender, EventArgs e)
@@ -116,6 +124,13 @@ namespace CemuStub
             {
                 CemuWatch.UnmodGame();
             })).Enabled = CemuWatch.InterfaceEnabled;
+
+            loadMenuItems.Items.Add(new ToolStripSeparator());
+            loadMenuItems.Items.Add("Toggle Cemu version override", null, new EventHandler((ob, ev) =>
+            {
+                lbTargetVersion.Visible = !lbTargetVersion.Visible;
+                tbExpectedVersion.Visible = !tbExpectedVersion.Visible;
+            }));
 
             loadMenuItems.Show(this, locate);
         }
