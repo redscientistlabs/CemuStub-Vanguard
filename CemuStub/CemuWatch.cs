@@ -19,7 +19,7 @@ namespace CemuStub
     public static class CemuWatch
     {
         static Timer watch = null;
-        public static string CemuStubVersion = "0.1.0";
+        public static string CemuStubVersion = "0.1.1";
         public static string expectedCemuVersion { get; set; } = "1.15.10";
         public static string expectedCemuTitle => "Cemu " + expectedCemuVersion;
 
@@ -401,11 +401,7 @@ namespace CemuStub
 
         internal static void KillCemuProcess()
         {
-            if (cemuProcess == null)
-                return;
-
             var p = cemuProcess;
-            //killing cemu
             {
                 ProcessStartInfo psi = new ProcessStartInfo();
                 psi.FileName = "taskkill";
@@ -417,8 +413,10 @@ namespace CemuStub
 
                 Process.Start(psi);
             }
-
-            p.WaitForExit();
+            if (p == null)
+                System.Threading.Thread.Sleep(300); //Sleep for 300ms in case there's a cemu process we don't have a handle to
+            else
+                p.WaitForExit();
         }
 
         private static bool LoadDataFromCemuFiles()
