@@ -70,14 +70,14 @@ namespace Vanguard
                         {
                             //We still need to set the emulator's path
                             AllSpec.VanguardSpec.Update(VSPEC.EMUDIR, CemuWatch.currentGameInfo.cemuExeFile.Directory.FullName);
-                            SyncObjectSingleton.FormExecute((o, ea) =>
+                            SyncObjectSingleton.FormExecute(() =>
                             {
                                 CemuWatch.UpdateDomains();
                             });
                         }
                         break;
                     case SAVESAVESTATE:
-                        SyncObjectSingleton.FormExecute((o, ea) =>
+                        SyncObjectSingleton.FormExecute(() =>
                         {
                             e.setReturnValue(VanguardCore.SaveSavestate_NET(advancedMessage.objectValue as string));
                             //e.setReturnValue("");
@@ -90,7 +90,7 @@ namespace Vanguard
                             var cmd = advancedMessage.objectValue as object[];
                             var path = cmd[0] as string;
                             var location = (StashKeySavestateLocation)cmd[1];
-                            SyncObjectSingleton.FormExecute((o, ea) =>
+                            SyncObjectSingleton.FormExecute(() =>
                             {
                                 e.setReturnValue(VanguardCore.LoadSavestate_NET(path, location));
                             });
@@ -108,7 +108,7 @@ namespace Vanguard
                     case REMOTE_POSTCORRUPTACTION:
                         {
                             //var fileName = advancedMessage.objectValue as String;
-                            SyncObjectSingleton.FormExecute((o, ea) =>
+                            SyncObjectSingleton.FormExecute(() =>
                             {
                                 CemuWatch.StartRpx();
                             });
@@ -117,7 +117,7 @@ namespace Vanguard
                         break;
 
                     case REMOTE_CLOSEGAME:
-                        SyncObjectSingleton.FormExecute((o, ea) =>
+                        SyncObjectSingleton.FormExecute(() =>
                         {
                             CemuWatch.KillCemuProcess();
                         });
@@ -125,13 +125,13 @@ namespace Vanguard
                         break;
 
                     case REMOTE_DOMAIN_GETDOMAINS:
-                        SyncObjectSingleton.FormExecute((o, ea) =>
+                        SyncObjectSingleton.FormExecute(() =>
                         {
                             e.setReturnValue(CemuWatch.GetInterfaces());
                         });
                         break;
                     case REMOTE_EVENT_EMU_MAINFORM_CLOSE:
-                        SyncObjectSingleton.FormExecute((o, ea) =>
+                        SyncObjectSingleton.FormExecute(() =>
                         {
                             Environment.Exit(0);
                         });
