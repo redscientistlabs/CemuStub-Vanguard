@@ -30,7 +30,17 @@ namespace CemuStub
 
         public static bool DontSelectGame = false;
 
-        static CemuState state = CemuState.UNFOUND;
+        private static CemuState _state = CemuState.UNFOUND;
+
+        private static CemuState state
+        {
+            get => _state;
+            set
+            {
+                Console.WriteLine($"Setting state to {value}");
+                _state = value;
+            }
+        }
 
         static Process cemuProcess = null;
         internal static bool writeCopyMode = false;
@@ -42,6 +52,8 @@ namespace CemuStub
 
         public static void Start()
         {
+            NetCore_Extensions.ConsoleHelper.CreateConsole(Path.GetDirectoryName(Application.ExecutablePath) + "\\log.txt");
+            Console.WriteLine("Initialized");
             if (watch != null)
             {
                 watch.Stop();
@@ -411,12 +423,20 @@ namespace CemuStub
                 psi.UseShellExecute = false;
                 psi.CreateNoWindow = true;
 
-                Process.Start(psi);
+                Process _p = new Process();
+                _p.OutputDataReceived += (sender, args) => Console.WriteLine("received output: {0}", args.Data);
+                _p.ErrorDataReceived += (sender, args) => Console.WriteLine("received error: {0}", args.Data);
+                _p.StartInfo = psi;
+                _p.Start();
+                _p.BeginOutputReadLine();
             }
             if (p == null)
                 System.Threading.Thread.Sleep(300); //Sleep for 300ms in case there's a cemu process we don't have a handle to
             else
+            {
                 p.WaitForExit();
+
+            }
         }
 
         private static bool LoadDataFromCemuFiles()
@@ -728,7 +748,7 @@ namespace CemuStub
             catch (Exception e)
             {
                 cemuProcess = null;
-                Console.WriteLine(e);
+                Console.WriteLine($"Couldn't get process from pid {cemuProcess?.Id ?? -1}\n {e}");
             }
             //If the title is still expectedCemuTitle, we know something else didn't eat the pid 
             if (!(cemuProcess?.MainWindowTitle.Contains(expectedCemuTitle) ?? false))
@@ -740,7 +760,20 @@ namespace CemuStub
         public static void RefreshCemuProcess(Process p = null)
         {
             if (p == null)
-                p = Process.GetProcessesByName("Cemu").FirstOrDefault(it => it?.MainWindowTitle?.Contains(expectedCemuTitle) ?? false);
+            {
+                try
+                {
+                    p = Process.GetProcessesByName("Cemu")
+                        .FirstOrDefault(it => it?.MainWindowTitle?.Contains(expectedCemuTitle) ?? false);
+                }
+                catch (InvalidOperationException e)
+                {
+                    Console.WriteLine($"Failed to get process!\n{e.Message}");
+                    cemuProcess = null;
+                    return;
+                }
+            }
+                
 
             cemuProcess = p;
 
