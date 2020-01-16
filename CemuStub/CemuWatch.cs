@@ -20,7 +20,7 @@ namespace CemuStub
     {
         static Timer watch = null;
         public static string CemuStubVersion = "0.1.6";
-        public static string expectedCemuVersion { get; set; } = "1.16.0";
+        public static string expectedCemuVersion { get; set; } = "1.16.1";
         public static string expectedCemuTitle => "Cemu " + expectedCemuVersion;
 
         public static string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -271,7 +271,7 @@ namespace CemuStub
 
                 KillCemuProcess();
 
-                if (!LoadDataFromCemuFiles())
+                if (!LoadDataFromCemuFilesXml())
                     return; //Could not get the rpx file location
 
                 // Prepare fake update and backup
@@ -438,8 +438,59 @@ namespace CemuStub
 
             }
         }
+        private static bool LoadDataFromCemuFilesXml()
+        {
+            ///
+            ///gathering data from log.txt and settings.xml files
+            ///
 
-        private static bool LoadDataFromCemuFiles()
+            string[] logTxt = File.ReadAllLines(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "log.txt"));
+            string[] settingsXml = File.ReadAllLines(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "settings.xml"));
+
+            //getting rpx filename from log.txt
+            string logLoadingLine = logTxt.FirstOrDefault(it => it.Contains("Loading") && it.Contains(".rpx"));
+            string[] logLoadingLineParts = logLoadingLine.Split(' ');
+            currentGameInfo.rpxFile = logLoadingLineParts[logLoadingLineParts.Length - 1];
+
+            //getting full rpx path from settings.xml
+            string settingsXmlRpxLine = settingsXml.FirstOrDefault(it => it.Contains(currentGameInfo.rpxFile));
+            string[] settingsXmlRpxLineParts = settingsXmlRpxLine.Split('>')[1].Split('<');
+
+            //gameRpxPath = 
+            //gameRpxFileInfo = new FileInfo(gameRpxPath);
+            //updateRpxPath = Path.Combine(cemuExeFile.DirectoryName, "mlc01", "usr", "title", FirstID, SecondID);
+
+            //updateCodePath = Path.Combine(updateRpxPath, "code");
+            //updateMetaPath = Path.Combine(updateRpxPath, "meta");
+
+
+
+            //updateRpxLocation = Path.Combine(updateCodePath, rpxFile);
+            //updateRpxCompressed = Path.Combine(updateCodePath, "compressed_" + rpxFile);
+            //updateRpxBackup = Path.Combine(updateCodePath, "backup_" + rpxFile);
+
+
+            currentGameInfo.gameRpxPath = settingsXmlRpxLineParts[0];
+            currentGameInfo.gameRpxFileInfo = new FileInfo(currentGameInfo.gameRpxPath);
+            currentGameInfo.updateRpxPath = Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "mlc01", "usr", "title", currentGameInfo.FirstID, currentGameInfo.SecondID);
+
+            currentGameInfo.updateCodePath = Path.Combine(currentGameInfo.updateRpxPath, "code");
+            currentGameInfo.updateMetaPath = Path.Combine(currentGameInfo.updateRpxPath, "meta");
+
+            currentGameInfo.gameSaveFolder = new DirectoryInfo(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "mlc01", "usr", "save", currentGameInfo.FirstID, currentGameInfo.SecondID));
+
+
+
+            currentGameInfo.updateRpxLocation = Path.Combine(currentGameInfo.updateCodePath, currentGameInfo.rpxFile);
+            currentGameInfo.updateRpxCompressed = Path.Combine(currentGameInfo.updateCodePath, "compressed_" + currentGameInfo.rpxFile);
+            currentGameInfo.updateRpxBackup = Path.Combine(currentGameInfo.updateCodePath, "backup_" + currentGameInfo.rpxFile);
+            currentGameInfo.updateRpxUncompressedToken = Path.Combine(currentGameInfo.updateCodePath, "UNCOMPRESSED.txt");
+
+
+            return true;
+        }
+
+        private static bool LoadDataFromCemuFilesBin()
         {
             ///
             ///gathering data from log.txt and settings.xml files
