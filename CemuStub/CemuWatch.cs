@@ -19,7 +19,7 @@ namespace CemuStub
     public static class CemuWatch
     {
         static Timer watch = null;
-        public static string CemuStubVersion = "0.1.6";
+        public static string CemuStubVersion = "0.1.7";
         public static string expectedCemuVersion { get; set; } = "1.16.1";
         public static string expectedCemuTitle => "Cemu " + expectedCemuVersion;
 
