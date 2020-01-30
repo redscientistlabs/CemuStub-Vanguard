@@ -1,7 +1,7 @@
 ﻿using CemuStub;
 using RTCV.CorruptCore;
+using RTCV.Common;
 using RTCV.NetCore;
-using RTCV.NetCore.StaticTools;
 using RTCV.Vanguard;
 using System;
 using System.Collections.Generic;

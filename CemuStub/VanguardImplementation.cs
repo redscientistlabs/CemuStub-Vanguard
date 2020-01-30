@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using RTCV;
 using RTCV.CorruptCore;
+using RTCV.Common;
 using static RTCV.NetCore.NetcoreCommands;
 using CemuStub;
-using RTCV.NetCore.StaticTools;
 
 namespace Vanguard
 {

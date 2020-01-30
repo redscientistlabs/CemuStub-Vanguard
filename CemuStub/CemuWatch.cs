@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RTCV.CorruptCore;
 using RTCV.NetCore;
-using RTCV.NetCore.StaticTools;
+using RTCV.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,7 +19,7 @@ namespace CemuStub
     public static class CemuWatch
     {
         static Timer watch = null;
-        public static string CemuStubVersion = "0.1.8";
+        public static string CemuStubVersion = "0.1.9";
         public static string expectedCemuVersion { get; set; } = "1.16.1";
         public static string expectedCemuTitle => "Cemu " + expectedCemuVersion;
 
