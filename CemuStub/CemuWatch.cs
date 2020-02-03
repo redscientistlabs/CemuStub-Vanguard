@@ -52,7 +52,8 @@ namespace CemuStub
 
         public static void Start()
         {
-            NetCore_Extensions.ConsoleHelper.CreateConsole(Path.GetDirectoryName(Application.ExecutablePath) + "\\log.txt");
+            //NetCore_Extensions.ConsoleHelper.CreateConsole(Path.GetDirectoryName(Application.ExecutablePath) + "\\log.txt");
+            RTCV.Common.Logging.StartLogging(VanguardCore.logPath);
             Console.WriteLine("Initialized");
             if (watch != null)
             {
