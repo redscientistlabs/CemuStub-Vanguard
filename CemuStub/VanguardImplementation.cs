@@ -101,7 +101,7 @@ namespace Vanguard
                         }
 
                     case REMOTE_PRECORRUPTACTION:
-                        CemuWatch.KillCemuProcess();
+                        CemuWatch.KillCemuProcess(false);
                         CemuWatch.RestoreBackup();
                         break;
 
@@ -119,7 +119,7 @@ namespace Vanguard
                     case REMOTE_CLOSEGAME:
                         SyncObjectSingleton.FormExecute(() =>
                         {
-                            CemuWatch.KillCemuProcess();
+                            CemuWatch.KillCemuProcess(false);
                         });
 
                         break;

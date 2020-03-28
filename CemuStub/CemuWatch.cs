@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,8 +20,8 @@ namespace CemuStub
     public static class CemuWatch
     {
         static Timer watch = null;
-        public static string CemuStubVersion = "0.1.9";
-        public static string expectedCemuVersion { get; set; } = "1.16.1";
+        public static string CemuStubVersion = "0.2.0";
+        public static string expectedCemuVersion { get; set; } = "1.17.4";
         public static string expectedCemuTitle => "Cemu " + expectedCemuVersion;
 
         public static string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -146,7 +147,7 @@ namespace CemuStub
 
         internal static void UnmodGame()
         {
-            KillCemuProcess();
+            KillCemuProcess(false);
 
             //remove item from known games and go back to autodetect
             var lastRef = CemuWatch.currentGameInfo;
@@ -270,10 +271,13 @@ namespace CemuStub
                 }
 
 
-                KillCemuProcess();
+                KillCemuProcess(true);
 
                 if (!LoadDataFromCemuFilesXml())
+                {
+                    MessageBox.Show("Failed to get RPX file location from Cemu.\nIf you continue to see this error, let the RTC Devs know.");
                     return; //Could not get the rpx file location
+                }
 
                 // Prepare fake update and backup
                 PrepareUpdateFolder();
@@ -412,81 +416,129 @@ namespace CemuStub
             return true;
         }
 
-        internal static void KillCemuProcess()
-        {
-            var p = cemuProcess;
-            {
-                ProcessStartInfo psi = new ProcessStartInfo();
-                psi.FileName = "taskkill";
-                psi.Arguments = $"/F /IM {currentGameInfo.cemuExeFile.Name} /T";
-                psi.RedirectStandardOutput = true;
-                psi.RedirectStandardError = true;
-                psi.UseShellExecute = false;
-                psi.CreateNoWindow = true;
+        [DllImport("user32.dll")]
+        private static extern int SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
 
-                Process _p = new Process();
-                _p.OutputDataReceived += (sender, args) => Console.WriteLine("received output: {0}", args.Data);
-                _p.ErrorDataReceived += (sender, args) => Console.WriteLine("received error: {0}", args.Data);
-                _p.StartInfo = psi;
-                _p.Start();
-                _p.BeginOutputReadLine();
+        private const int WM_CLOSE = 0x0010;
+        private const int WM_DESTROY = 0x0011;
+        private const int WM_QUIT = 0x0012;
+        internal static void KillCemuProcess(bool graceful)
+        {
+            if (graceful)
+            {
+                var cemus = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(currentGameInfo.cemuExeFile.FullName));
+                MessageBox.Show("Closing Cemu to configure the loaded game for CemuStub.\n\n" +
+                                "IF YOU OPENED ANY MENUS WHILE THE GAME WAS LOADING, AN ERROR MAY OCCUR. If an error occurs, try again. If it keeps occurring, poke the RTC devs.\n\n" +
+                                "If Cemu doesn't close, quit it yourself to continue.", 
+                        "Registering Game for CemuStub", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Information, 
+                        MessageBoxDefaultButton.Button1, 
+                        MessageBoxOptions.DefaultDesktopOnly);
+                foreach (var p in cemus)
+                {
+                    try
+                    {
+                        var children = WindowHandleInfo.GetAllChildHandles(p.MainWindowHandle);
+                        if (children != null)
+                        {
+                            foreach (var h in children)
+                            {
+                                SendMessage(h, WM_CLOSE, new IntPtr(0), new IntPtr(0));
+                            }
+                        }
+                        SendMessage(p.MainWindowHandle, WM_CLOSE, new IntPtr(0), new IntPtr(0));
+                        p.CloseMainWindow();
+                        p.WaitForExit();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
             }
-            if (p == null)
-                System.Threading.Thread.Sleep(300); //Sleep for 300ms in case there's a cemu process we don't have a handle to
             else
             {
-                p.WaitForExit();
+                var p = cemuProcess;
+                {
+                    ProcessStartInfo psi = new ProcessStartInfo();
+                    psi.FileName = "taskkill";
+                    psi.Arguments = $"/F /IM {currentGameInfo.cemuExeFile.Name} /T";
+                    psi.RedirectStandardOutput = true;
+                    psi.RedirectStandardError = true;
+                    psi.UseShellExecute = false;
+                    psi.CreateNoWindow = true;
 
+                    Process _p = new Process();
+                    _p.OutputDataReceived += (sender, args) => Console.WriteLine("received output: {0}", args.Data);
+                    _p.ErrorDataReceived += (sender, args) => Console.WriteLine("received error: {0}", args.Data);
+                    _p.StartInfo = psi;
+                    _p.Start();
+                    _p.BeginOutputReadLine();
+                }
+                if (p == null)
+                    System.Threading.Thread.Sleep(300); //Sleep for 300ms in case there's a cemu process we don't have a handle to
+                else
+                {
+                    p.WaitForExit();
+                }
             }
         }
         private static bool LoadDataFromCemuFilesXml()
         {
-            ///
-            ///gathering data from log.txt and settings.xml files
-            ///
+                ///
+                ///gathering data from log.txt and settings.xml files
+                ///
 
-            string[] logTxt = File.ReadAllLines(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "log.txt"));
-            string[] settingsXml = File.ReadAllLines(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "settings.xml"));
+                string[] logTxt = File.ReadAllLines(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "log.txt"));
+                string[] settingsXml =
+                    File.ReadAllLines(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "settings.xml"));
 
-            //getting rpx filename from log.txt
-            string logLoadingLine = logTxt.FirstOrDefault(it => it.Contains("Loading") && it.Contains(".rpx"));
-            string[] logLoadingLineParts = logLoadingLine.Split(' ');
-            currentGameInfo.rpxFile = logLoadingLineParts[logLoadingLineParts.Length - 1];
+                //getting rpx filename from log.txt
+                string logLoadingLine = logTxt.FirstOrDefault(it => it.Contains("Loading") && it.Contains(".rpx"));
+                string[] logLoadingLineParts = logLoadingLine.Split(' ');
+                currentGameInfo.rpxFile = logLoadingLineParts[logLoadingLineParts.Length - 1];
 
-            //getting full rpx path from settings.xml
-            string settingsXmlRpxLine = settingsXml.FirstOrDefault(it => it.Contains(currentGameInfo.rpxFile));
-            string[] settingsXmlRpxLineParts = settingsXmlRpxLine.Split('>')[1].Split('<');
+                //getting full rpx path from settings.xml
+                string settingsXmlRpxLine = settingsXml.FirstOrDefault(it => it.Contains(currentGameInfo.rpxFile));
+                string[] settingsXmlRpxLineParts = settingsXmlRpxLine.Split('>')[1].Split('<');
 
-            //gameRpxPath = 
-            //gameRpxFileInfo = new FileInfo(gameRpxPath);
-            //updateRpxPath = Path.Combine(cemuExeFile.DirectoryName, "mlc01", "usr", "title", FirstID, SecondID);
+                //gameRpxPath = 
+                //gameRpxFileInfo = new FileInfo(gameRpxPath);
+                //updateRpxPath = Path.Combine(cemuExeFile.DirectoryName, "mlc01", "usr", "title", FirstID, SecondID);
 
-            //updateCodePath = Path.Combine(updateRpxPath, "code");
-            //updateMetaPath = Path.Combine(updateRpxPath, "meta");
-
-
-
-            //updateRpxLocation = Path.Combine(updateCodePath, rpxFile);
-            //updateRpxCompressed = Path.Combine(updateCodePath, "compressed_" + rpxFile);
-            //updateRpxBackup = Path.Combine(updateCodePath, "backup_" + rpxFile);
-
-
-            currentGameInfo.gameRpxPath = settingsXmlRpxLineParts[0];
-            currentGameInfo.gameRpxFileInfo = new FileInfo(currentGameInfo.gameRpxPath);
-            currentGameInfo.updateRpxPath = Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "mlc01", "usr", "title", currentGameInfo.FirstID, currentGameInfo.SecondID);
-
-            currentGameInfo.updateCodePath = Path.Combine(currentGameInfo.updateRpxPath, "code");
-            currentGameInfo.updateMetaPath = Path.Combine(currentGameInfo.updateRpxPath, "meta");
-
-            currentGameInfo.gameSaveFolder = new DirectoryInfo(Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "mlc01", "usr", "save", currentGameInfo.FirstID, currentGameInfo.SecondID));
+                //updateCodePath = Path.Combine(updateRpxPath, "code");
+                //updateMetaPath = Path.Combine(updateRpxPath, "meta");
 
 
 
-            currentGameInfo.updateRpxLocation = Path.Combine(currentGameInfo.updateCodePath, currentGameInfo.rpxFile);
-            currentGameInfo.updateRpxCompressed = Path.Combine(currentGameInfo.updateCodePath, "compressed_" + currentGameInfo.rpxFile);
-            currentGameInfo.updateRpxBackup = Path.Combine(currentGameInfo.updateCodePath, "backup_" + currentGameInfo.rpxFile);
-            currentGameInfo.updateRpxUncompressedToken = Path.Combine(currentGameInfo.updateCodePath, "UNCOMPRESSED.txt");
+                //updateRpxLocation = Path.Combine(updateCodePath, rpxFile);
+                //updateRpxCompressed = Path.Combine(updateCodePath, "compressed_" + rpxFile);
+                //updateRpxBackup = Path.Combine(updateCodePath, "backup_" + rpxFile);
 
+
+                currentGameInfo.gameRpxPath = settingsXmlRpxLineParts[0];
+                currentGameInfo.gameRpxFileInfo = new FileInfo(currentGameInfo.gameRpxPath);
+                currentGameInfo.updateRpxPath = Path.Combine(currentGameInfo.cemuExeFile.DirectoryName, "mlc01", "usr",
+                    "title", currentGameInfo.FirstID, currentGameInfo.SecondID);
+
+                currentGameInfo.updateCodePath = Path.Combine(currentGameInfo.updateRpxPath, "code");
+                currentGameInfo.updateMetaPath = Path.Combine(currentGameInfo.updateRpxPath, "meta");
+
+                currentGameInfo.gameSaveFolder = new DirectoryInfo(Path.Combine(
+                    currentGameInfo.cemuExeFile.DirectoryName, "mlc01", "usr", "save", currentGameInfo.FirstID,
+                    currentGameInfo.SecondID));
+
+
+
+                currentGameInfo.updateRpxLocation =
+                    Path.Combine(currentGameInfo.updateCodePath, currentGameInfo.rpxFile);
+                currentGameInfo.updateRpxCompressed = Path.Combine(currentGameInfo.updateCodePath,
+                    "compressed_" + currentGameInfo.rpxFile);
+                currentGameInfo.updateRpxBackup =
+                    Path.Combine(currentGameInfo.updateCodePath, "backup_" + currentGameInfo.rpxFile);
+                currentGameInfo.updateRpxUncompressedToken =
+                    Path.Combine(currentGameInfo.updateCodePath, "UNCOMPRESSED.txt");
 
             return true;
         }
@@ -855,4 +907,47 @@ namespace CemuStub
 
     }
 
+}
+public static class WindowHandleInfo
+{
+    private delegate bool EnumWindowProc(IntPtr hwnd, IntPtr lParam);
+
+    [DllImport("user32")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool EnumChildWindows(IntPtr window, EnumWindowProc callback, IntPtr lParam);
+
+    public static List<IntPtr> GetAllChildHandles(IntPtr MainHandle)
+    {
+        List<IntPtr> childHandles = new List<IntPtr>();
+
+        GCHandle gcChildhandlesList = GCHandle.Alloc(childHandles);
+        IntPtr pointerChildHandlesList = GCHandle.ToIntPtr(gcChildhandlesList);
+
+        try
+        {
+            EnumWindowProc childProc = new EnumWindowProc(EnumWindow);
+            EnumChildWindows(MainHandle, childProc, pointerChildHandlesList);
+        }
+        finally
+        {
+            gcChildhandlesList.Free();
+        }
+
+        return childHandles;
+    }
+
+    private static bool EnumWindow(IntPtr hWnd, IntPtr lParam)
+    {
+        GCHandle gcChildhandlesList = GCHandle.FromIntPtr(lParam);
+
+        if (gcChildhandlesList == null || gcChildhandlesList.Target == null)
+        {
+            return false;
+        }
+
+        List<IntPtr> childHandles = gcChildhandlesList.Target as List<IntPtr>;
+        childHandles.Add(hWnd);
+
+        return true;
+    }
 }
