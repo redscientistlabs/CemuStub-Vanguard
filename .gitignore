@@ -2,3 +2,4 @@
 CemuStub/bin/*
 CemuStub/obj/*
 packages/*
+.vscode
