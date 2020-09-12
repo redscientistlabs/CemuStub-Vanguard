@@ -12,6 +12,7 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using RTCV.NetCore.Enums;
 
 namespace Vanguard
 {

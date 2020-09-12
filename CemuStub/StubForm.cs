@@ -49,7 +49,7 @@ namespace CemuStub
             cbSelectedGame.SelectedIndex = 0;
             CemuWatch.LoadKnownGames();
 
-            UICore.SetRTCColor(Color.LightSteelBlue, this);
+            Colors.SetRTCColor(Color.LightSteelBlue, this);
             lbTargetVersion.Focus();
         }
 
