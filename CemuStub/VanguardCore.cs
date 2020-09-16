@@ -160,8 +160,8 @@ namespace Vanguard
             if (VanguardCore.attached)
                 RTCV.Vanguard.VanguardConnector.PushVanguardSpecRef(AllSpec.VanguardSpec);
 
-            LocalNetCoreRouter.Route(NetcoreCommands.CORRUPTCORE, NetcoreCommands.REMOTE_PUSHVANGUARDSPEC, emuSpecTemplate, true);
-            LocalNetCoreRouter.Route(NetcoreCommands.UI, NetcoreCommands.REMOTE_PUSHVANGUARDSPEC, emuSpecTemplate, true);
+            LocalNetCoreRouter.Route(RTCV.NetCore.Commands.Basic.CorruptCore, RTCV.NetCore.Commands.Remote.PushVanguardSpec, emuSpecTemplate, true);
+            LocalNetCoreRouter.Route(RTCV.NetCore.Commands.Basic.UI, RTCV.NetCore.Commands.Remote.PushVanguardSpec, emuSpecTemplate, true);
 
 
             AllSpec.VanguardSpec.SpecUpdated += (o, e) =>
@@ -169,13 +169,13 @@ namespace Vanguard
                 PartialSpec partial = e.partialSpec;
 
 
-                LocalNetCoreRouter.Route(NetcoreCommands.CORRUPTCORE, NetcoreCommands.REMOTE_PUSHVANGUARDSPECUPDATE, partial, true);
-                LocalNetCoreRouter.Route(NetcoreCommands.UI, NetcoreCommands.REMOTE_PUSHVANGUARDSPECUPDATE, partial, true);
+                LocalNetCoreRouter.Route(RTCV.NetCore.Commands.Basic.CorruptCore, RTCV.NetCore.Commands.Remote.PushVanguardSpecUpdate, partial, true);
+                LocalNetCoreRouter.Route(RTCV.NetCore.Commands.Basic.UI, RTCV.NetCore.Commands.Remote.PushVanguardSpecUpdate, partial, true);
             };
         }
 
         //This is the entry point of RTC. Without this method, nothing will load.
-        
+
         public static void Start()
         {
 
@@ -237,7 +237,7 @@ namespace Vanguard
         }
 
         /// <summary>
-        /// Loads a savestate from a path. 
+        /// Loads a savestate from a path.
         /// </summary>
         /// <param name="path">The path of the state</param>
         /// <param name="stateLocation">Where the state is located in a stashkey (used for errors, not required)</param>
