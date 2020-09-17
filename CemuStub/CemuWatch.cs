@@ -188,7 +188,7 @@ namespace CemuStub
             var cemuFullPath = currentGameInfo.cemuExeFile;
             if (!File.Exists(cemuFullPath.FullName))
             {
-                //Cemu could not be found. Prompt a message for replacement, a browse box, and replace all refs for the known games 
+                //Cemu could not be found. Prompt a message for replacement, a browse box, and replace all refs for the known games
 
                 string message = "Cemu Stub couldn't find Cemu emulator. Would you like to specify a new location?";
                 var result = MessageBox.Show(message, "Error finding cemu", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
@@ -401,7 +401,7 @@ namespace CemuStub
                 MessageBox.Show("Cemu is in online mode. Cancelling load to prevent any potential bans.\nDisable online mode to use the Cemustub");
                 return false;
             }
-                
+
 
             string TitleIdPart = windowTitle.Split('[').FirstOrDefault(it => it.Contains("TitleId:"));
             string TitleNumberPartLong = TitleIdPart.Split(':')[1];
@@ -429,11 +429,11 @@ namespace CemuStub
                 var cemus = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(currentGameInfo.cemuExeFile.FullName));
                 MessageBox.Show("Closing Cemu to configure the loaded game for CemuStub.\n\n" +
                                 "IF YOU OPENED ANY MENUS WHILE THE GAME WAS LOADING, AN ERROR MAY OCCUR. If an error occurs, try again. If it keeps occurring, poke the RTC devs.\n\n" +
-                                "If Cemu doesn't close, quit it yourself to continue.", 
-                        "Registering Game for CemuStub", 
-                        MessageBoxButtons.OK, 
-                        MessageBoxIcon.Information, 
-                        MessageBoxDefaultButton.Button1, 
+                                "If Cemu doesn't close, quit it yourself to continue.",
+                        "Registering Game for CemuStub",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information,
+                        MessageBoxDefaultButton.Button1,
                         MessageBoxOptions.DefaultDesktopOnly);
                 foreach (var p in cemus)
                 {
@@ -503,7 +503,7 @@ namespace CemuStub
                 string settingsXmlRpxLine = settingsXml.FirstOrDefault(it => it.Contains(currentGameInfo.rpxFile));
                 string[] settingsXmlRpxLineParts = settingsXmlRpxLine.Split('>')[1].Split('<');
 
-                //gameRpxPath = 
+                //gameRpxPath =
                 //gameRpxFileInfo = new FileInfo(gameRpxPath);
                 //updateRpxPath = Path.Combine(cemuExeFile.DirectoryName, "mlc01", "usr", "title", FirstID, SecondID);
 
@@ -635,10 +635,10 @@ namespace CemuStub
                 AllSpec.VanguardSpec.Update(gameDone);
 
                 //This is local. If the domains changed it propgates over netcore
-                LocalNetCoreRouter.Route(NetcoreCommands.CORRUPTCORE, NetcoreCommands.REMOTE_EVENT_DOMAINSUPDATED, true, true);
+                LocalNetCoreRouter.Route(RTCV.NetCore.Commands.Basic.CorruptCore, RTCV.NetCore.Commands.Remote.EventDomainsUpdated, true, true);
 
                 //Asks RTC to restrict any features unsupported by the stub
-                LocalNetCoreRouter.Route(NetcoreCommands.CORRUPTCORE, NetcoreCommands.REMOTE_EVENT_RESTRICTFEATURES, true, true);
+                LocalNetCoreRouter.Route(RTCV.NetCore.Commands.Basic.CorruptCore, RTCV.NetCore.Commands.Remote.EventRestrictFeatures, true, true);
 
             }
             catch (Exception ex)
@@ -813,9 +813,9 @@ namespace CemuStub
                 state = CemuState.RUNNING;
             }
             else if (
-                state != CemuState.UNFOUND && 
-                state != CemuState.GAMELOADED && 
-                state != CemuState.READY && 
+                state != CemuState.UNFOUND &&
+                state != CemuState.GAMELOADED &&
+                state != CemuState.READY &&
                 p == null)
             {
                 S.GET<StubForm>().lbCemuStatus.Text = "Waiting for Cemu";
@@ -843,7 +843,7 @@ namespace CemuStub
             {
                 RefreshCemuProcess();
             }
-            //Get a new process object from then pid we have. 
+            //Get a new process object from then pid we have.
             try
             {
                 if(cemuProcess?.Id != null)
@@ -854,7 +854,7 @@ namespace CemuStub
                 cemuProcess = null;
                 Console.WriteLine($"Couldn't get process from pid {cemuProcess?.Id ?? -1}\n {e}");
             }
-            //If the title is still expectedCemuTitle, we know something else didn't eat the pid 
+            //If the title is still expectedCemuTitle, we know something else didn't eat the pid
             if (!(cemuProcess?.MainWindowTitle.Contains(expectedCemuTitle) ?? false))
                 RefreshCemuProcess();
 
@@ -877,7 +877,7 @@ namespace CemuStub
                     return;
                 }
             }
-                
+
 
             cemuProcess = p;
 
